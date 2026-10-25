@@ -9,17 +9,25 @@ public class Trie {
         private Promocion promo;
 
         public Nodo() {
-            letras = new Nodo[26];
+            letras = new Nodo[37];
             promo = null;
         }
 
         public Nodo(Promocion promocion) {
-            letras = new Nodo[26];
+            letras = new Nodo[37];
             promo = promocion;
         }
 
         public int indice(char c) {
-            return c - 'a';
+            if (c == 'ñ') {
+                return 26;
+            }
+            else if (c >= '0' && c <= '9') {
+                return c - '0' + 27;
+            }
+            else {
+                return c - 'a';
+            }
         }
 
         public boolean haySiguiente(char c) {
