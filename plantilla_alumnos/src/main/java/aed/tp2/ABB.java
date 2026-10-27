@@ -78,11 +78,142 @@ class ABB<T extends Comparable<T>> {
     }
 
     public Handle<T> insertar(T elem){
-        // (...)
+        if(pertenece(elem)){return;}
+        Nodo nuevo = new Nodo(elem);        
+        if(_raiz == null){_raiz = nuevo; _cardinalidad ++; }
+        else{
+            Nodo actual = _raiz;        
+            while(elem.compareTo(actual.valor) != 0){
+                if(elem.compareTo(actual.valor) < 0){
+                    if(actual.izq != null){
+                        actual = actual.izq;
+                    }else{
+                        actual.izq = nuevo;
+                        nuevo.padre = actual;
+                        _cardinalidad ++;
+                    }
+                }
+                else{
+                    if(actual.der != null){
+                        actual = actual.der;
+                    }else{
+                        actual.der = nuevo;
+                        nuevo.padre = actual;
+                        _cardinalidad ++;
+                    }
+                }}}
         return new HandleABB (new Nodo(elem));
     }
 
-    public void eliminarNodo (T elem) {}
+    public void eliminarNodo (T elem) {
+        if(!pertenece(elem)){ //si no pertenece no hago nada
+            return;
+        }
+        Nodo actual = _raiz;
+        while(actual.valor.compareTo(elem) != 0){ //Busco elemento a eliminar
+            if(elem.compareTo(actual.valor) < 0){
+                actual = actual.izq;            
+            }else if(elem.compareTo(actual.valor) > 0){
+                actual = actual.der;
+            }
+        }
+        if((actual.der != null) && (actual.izq !=null)){ //caso dos arboles hijos
+            Nodo sucesorInmediato = actual.der; // encuentro el sucesor inmediato            
+            while (sucesorInmediato.izq != null){
+                sucesorInmediato = sucesorInmediato.izq;
+            }
+            actual.valor = sucesorInmediato.valor;
+
+            if(sucesorInmediato == actual.der){
+                actual.der = sucesorInmediato.der;
+                if(sucesorInmediato.der != null){
+                    sucesorInmediato.der.padre = actual;
+                }
+            }else{                
+                sucesorInmediato.padre.izq = sucesorInmediato.der;
+                if(sucesorInmediato.der != null){
+                    sucesorInmediato.der.padre = sucesorInmediato.padre;
+                }
+            }}
+        else if((actual.der != null) || (actual.izq !=null)){ //caso un arbol
+            if(actual == _raiz){
+                if(actual.der != null){
+                    _raiz = actual.der;
+                    actual.der.padre = null;
+                }else{
+                    _raiz = actual.izq;
+                    actual.izq.padre = null;
+                }
+            }
+            else if(actual ==actual.padre.izq){
+                if(actual.der != null){
+                    actual.der.padre = actual.padre;
+                    actual.padre.izq = actual.der;
+                }else{
+                    actual.izq.padre = actual.padre;
+                    actual.padre.izq = actual.izq;
+                }
+            }else{
+                if(actual.der != null){
+                    actual.der.padre = actual.padre;
+                    actual.padre.der = actual.der;
+                }else{
+                    actual.izq.padre = actual.padre;
+                    actual.padre.der = actual.izq;
+                }}}
+        else{ //caso eliminar hoja
+            if(actual == _raiz){
+                _raiz = null;
+            }else{
+                if(actual == actual.padre.izq){
+                    actual.padre.izq = null;
+                }else{actual.padre.der = null;}
+
+            }}
+        _cardinalidad --;
+        //Aca tambien deberiamos pedir que, via handle, se elimine el usuario en el heap
+    }
+
+    public class ABB_Iterador {
+        private Nodo _actual;
+
+        public ABB_Iterador(){
+            _actual = _raiz;
+            while(_actual.izq != null){
+                _actual = _actual.izq; 
+            }
+        }
+
+        public boolean haySiguiente() {            
+            return _actual.valor.compareTo(maximo()) != 0;
+        }
+    
+        public T siguiente() {            
+            T devolver = _actual.valor;
+            if(haySiguiente()){
+                //caso si tiene derecha
+                if(_actual.der != null){
+                    Nodo nuevoActual = _actual.der;
+                    while(nuevoActual.izq != null){
+                        nuevoActual = nuevoActual.izq;                    
+                    }
+                    _actual = nuevoActual;
+                }else{
+                    Nodo nuevoActual = _actual.padre;
+                    Nodo valorAnterior = _actual;
+                    while(nuevoActual.izq.valor.compareTo(valorAnterior.valor) != 0){
+                        nuevoActual = nuevoActual.padre;
+                        valorAnterior = valorAnterior.padre;
+                    }
+                    _actual = nuevoActual;
+                }}           
+            return devolver;
+        }
+    }
+
+    public ABB_Iterador iterador() {
+        return new ABB_Iterador();
+    }
 }
 
     
