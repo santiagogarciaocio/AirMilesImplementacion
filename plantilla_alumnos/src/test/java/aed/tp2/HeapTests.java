@@ -9,13 +9,13 @@ public class HeapTests {
 
     @Test
     void crearHeap() {
-        Heap hp = new Heap();
+        Heap<Handle<Usuario>> hp = new Heap();
         assertEquals(0, hp.tamaño());
     }
 
     @Test
     void agregarElemento() {
-        Heap hp = new Heap();
+        Heap<Handle<Usuario>> hp = new Heap();
         Usuario u1 = new Usuario(1);
 
         hp.agregar(u1);
@@ -33,7 +33,7 @@ public class HeapTests {
         (U2, 10)(U4, 250)(U3, 300)(U6, 500)
         
         */
-        Heap hp = new Heap();
+        Heap<Handle<Usuario>> hp = new Heap();
         Usuario u1 = new Usuario(1);
         Usuario u2 = new Usuario(2);
         Usuario u3 = new Usuario(3);

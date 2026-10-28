@@ -2,9 +2,9 @@ package aed.tp2;
 
 class Usuario implements Comparable<Usuario> {
     private int ID;
-    private int Totales;
-    private int Disponibles;
-    private int Canjeadas;
+    private double Totales;
+    private double Disponibles;
+    private double Canjeadas;
     private Usuario ultimoUsuarioTransferido;
     private boolean esTransferidorExlusivo;
     private Usuario ultimoUsuarioRecibido;
@@ -49,15 +49,15 @@ class Usuario implements Comparable<Usuario> {
         return this.ID;
     }
     
-    public int totales(){
+    public double totales(){
         return this.Totales;
     }
 
-    public int disponibles(){
+    public double disponibles(){
         return this.Disponibles;    
     }
 
-    public int canjeadas(){
+    public double canjeadas(){
         return this.Canjeadas;
     }
 
@@ -81,12 +81,12 @@ class Usuario implements Comparable<Usuario> {
     /*Realizar Acciones */
     /*--------------------------------------------------------------------------------------------------------- */
 
-    public void acumularMillas(int millas){
+    public void acumularMillas(double millas){
         Totales = this.Totales + millas;
         Disponibles = this.Disponibles + millas;
     }
 
-    public void canjearMillas(int millas){
+    public void canjearMillas(double millas){
         /*Hay que agregar que tire error si se quieren canjear mas millas de las que se tiene? 
         Porque es un requiere pero me hace ruido no ponerlo */
         Disponibles = this.Disponibles - millas;
@@ -98,12 +98,12 @@ class Usuario implements Comparable<Usuario> {
     /*--------------------------------------------------------------------------------------------------------- */
 
 
-    public void transferencia(Usuario receptor, int millas){        
+    public void transferencia(Usuario receptor, double millas){        
         enviarTransferencia(this, receptor, millas);
         recibirTransferencia(this, receptor, millas);
     }    
 
-    public void enviarTransferencia(Usuario us_transferidor, Usuario us_receptor, int millas){
+    public void enviarTransferencia(Usuario us_transferidor, Usuario us_receptor, double millas){
         us_transferidor.canjearMillas(millas);
         us_transferidor.Totales = us_transferidor.Totales - millas;
         if(us_transferidor.ultimoUsuarioTransferido() == us_transferidor.ID()){
@@ -117,7 +117,7 @@ class Usuario implements Comparable<Usuario> {
     }
 
     
-    public void recibirTransferencia(Usuario us_transferidor, Usuario us_receptor, int millas){
+    public void recibirTransferencia(Usuario us_transferidor, Usuario us_receptor, double millas){
         us_receptor.acumularMillas(millas);            
         if(us_receptor.ultimoUsuarioRecibido() == us_receptor.ID()){
             us_receptor.ultimoUsuarioRecibido = us_transferidor;
@@ -158,7 +158,7 @@ class Usuario implements Comparable<Usuario> {
 
     /*Consultar categoria */
 
-    public String categoria(){
+    public String categoriaStrg(){
         if(this.Totales < 10000){
             return "Bronce";
         }else if (this.Totales < 50000){
@@ -168,7 +168,18 @@ class Usuario implements Comparable<Usuario> {
         }else{
             return "Platino";
         }
+    }
 
+    public double categoria(){
+        if(this.Totales < 10000){
+            return 1.0;
+        }else if (this.Totales < 50000){
+            return 1.5;
+        }else if(this.Totales < 1000000){
+            return 2.0;
+        }else{
+            return 2.5;
+        }
     }
 
     @Override 

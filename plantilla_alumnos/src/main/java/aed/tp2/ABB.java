@@ -1,20 +1,21 @@
 package aed.tp2;
 
-import aed.tp2.Trie.Nodo;
+import aed.tp2.TrieMalo.Nodo;
 
-class ABB<T extends Comparable<T>> {
+class ABBUsuarios {
 
     private Nodo _raíz;
     private int _cardinal;
     private int _altura;
+    /*Altura no lo usamos para nada, lo podemos eliminar? */
 
     private class Nodo {
-        T valor;
+        Usuario valor;
         Nodo izq;
         Nodo der;
         Nodo padre;
 
-        Nodo (T v) {
+        Nodo (Usuario v) {
             valor = v;
             izq = null;
             der = null;
@@ -22,41 +23,40 @@ class ABB<T extends Comparable<T>> {
         }
     }
     
-    private class HandleABB implements Handle<T>{
+    private class HandleABB implements Handle<Usuario>{
         private Nodo nodo;
 
         private HandleABB(Nodo n){
             this.nodo = n;
         }
 
-        public T valor(){
+        public Usuario valor(){
             return this.nodo.valor;
         }
 
-        public void eliminar(){
-            ABB.this.eliminarNodo(this.nodo.valor);
+        public void eliminar(){            
+            ABBUsuarios.this.eliminarNodo(this.nodo.valor);
         }
 
-        public int compareTo(Handle<T> otroHandle){
+        public int compareTo(Handle<Usuario> otroHandle){
             return this.valor().compareTo(otroHandle.valor());
         }
 
-        public String toString(){
-            String res = "" + this.valor();
-            return res;
+        public String toString(){            
+            return ABBUsuarios.this.toString();
         }
 
-        public void modificar (T v) {
+        public void modificar (Usuario v) {
             this.nodo.valor = v;
         }
 
-        public boolean equals (Handle<T> otroHandle) {
+        public boolean equals (Handle<Usuario> otroHandle) {
             boolean res = this.valor().compareTo(otroHandle.valor()) == 0;
             return res;
         }
     }
 
-    public ABB() {
+    public ABBUsuarios() {
         _raíz = null;
         _cardinal = 0;
         _altura = 0;
@@ -66,23 +66,78 @@ class ABB<T extends Comparable<T>> {
         return _cardinal;
     }
 
-    public boolean pertenece(T elem){
+    public Usuario minimo(){
+        Nodo actual = _raíz;
+        while(! (actual.izq == null)){
+            actual = actual.izq;
+        }
+        return actual.valor;
+    }
+
+    public Usuario maximo(){
+        Nodo actual = _raíz;
+        while(! (actual.der == null)){
+            actual = actual.der;
+        }
+        return actual.valor;        
+    }
+
+    public boolean pertenece(Usuario elem){
         return perteneceAux(_raíz, elem);
     }
 
-    private boolean perteneceAux (Nodo nodo, T elem) {
+    private boolean perteneceAux (Nodo nodo, Usuario elem) {
         if (nodo == null) {return false;}
         if (elem.compareTo(nodo.valor) == 0) {return true;}
         if (elem.compareTo(nodo.valor) > 0) {return perteneceAux (nodo.der, elem);}
         else {return perteneceAux (nodo.izq, elem);}
     }
 
-    public Handle<T> insertar(T elem){
-        if(pertenece(elem)){return;}
-        Nodo nuevo = new Nodo(elem);        
-        if(_raiz == null){_raiz = nuevo; _cardinalidad ++; }
+    public boolean pertenece(int id){
+        if (_cardinal == 0) {
+            return false;
+        }
+        Nodo actual = _raíz;        
+        while (actual != null) {         
+            if (id < actual.valor.ID()) {
+                actual = actual.izq;
+            } else if (id < actual.valor.ID()) {
+                actual = actual.der;
+            } else {
+                return true;
+            }}        
+        return false;
+    }
+
+    public Usuario usuario(int id){
+        if(! pertenece(id)){
+            throw new UnsupportedOperationException("El usuario no existe");
+        }
         else{
-            Nodo actual = _raiz;        
+            Nodo actual = _raíz;
+            while(id != actual.valor.ID()){
+                if(id < actual.valor.ID()){
+                    actual = actual.izq;
+                }
+                else{
+                    actual = actual.der;
+                }
+            }
+            return actual.valor;
+        }        
+    }
+
+    public Handle<Usuario> insertar(Usuario elem){
+        if(pertenece(elem)){
+            return null;
+        }
+        Nodo nuevo = new Nodo(elem);        
+        if(_raíz == null){
+            _raíz = nuevo; 
+            _cardinal ++; 
+        }
+        else{
+            Nodo actual = _raíz;        
             while(elem.compareTo(actual.valor) != 0){
                 if(elem.compareTo(actual.valor) < 0){
                     if(actual.izq != null){
@@ -90,7 +145,7 @@ class ABB<T extends Comparable<T>> {
                     }else{
                         actual.izq = nuevo;
                         nuevo.padre = actual;
-                        _cardinalidad ++;
+                        _cardinal ++;
                     }
                 }
                 else{
@@ -99,17 +154,17 @@ class ABB<T extends Comparable<T>> {
                     }else{
                         actual.der = nuevo;
                         nuevo.padre = actual;
-                        _cardinalidad ++;
+                        _cardinal ++;
                     }
                 }}}
-        return new HandleABB (new Nodo(elem));
+        return new HandleABB (nuevo);
     }
-
-    public void eliminarNodo (T elem) {
+/* En ningun momento usamos eliminar. No parece ser una opcion de AirMilles eliminar un usuario */
+    public void eliminarNodo (Usuario elem) {
         if(!pertenece(elem)){ //si no pertenece no hago nada
             return;
         }
-        Nodo actual = _raiz;
+        Nodo actual = _raíz;
         while(actual.valor.compareTo(elem) != 0){ //Busco elemento a eliminar
             if(elem.compareTo(actual.valor) < 0){
                 actual = actual.izq;            
@@ -136,12 +191,12 @@ class ABB<T extends Comparable<T>> {
                 }
             }}
         else if((actual.der != null) || (actual.izq !=null)){ //caso un arbol
-            if(actual == _raiz){
+            if(actual == _raíz){
                 if(actual.der != null){
-                    _raiz = actual.der;
+                    _raíz = actual.der;
                     actual.der.padre = null;
                 }else{
-                    _raiz = actual.izq;
+                    _raíz = actual.izq;
                     actual.izq.padre = null;
                 }
             }
@@ -162,23 +217,38 @@ class ABB<T extends Comparable<T>> {
                     actual.padre.der = actual.izq;
                 }}}
         else{ //caso eliminar hoja
-            if(actual == _raiz){
-                _raiz = null;
+            if(actual == _raíz){
+                _raíz = null;
             }else{
                 if(actual == actual.padre.izq){
                     actual.padre.izq = null;
                 }else{actual.padre.der = null;}
 
             }}
-        _cardinalidad --;
-        //Aca tambien deberiamos pedir que, via handle, se elimine el usuario en el heap
+        _cardinal --;
+    }
+
+    public String toString(){
+        if(_cardinal == 0){return "{}";}
+        else{
+            String res = "{";
+            ABBUsuarios.ABB_Iterador iterador = new ABB_Iterador();
+            while(iterador.haySiguiente()){
+                res = res+iterador.siguiente().toString();
+                if(iterador.haySiguiente()){res = res+",";}
+            }
+            if(_cardinal == 1) {
+                res = res+maximo();
+            }else{res = res+","+maximo();}
+            return res+"}";
+        }
     }
 
     public class ABB_Iterador {
         private Nodo _actual;
 
         public ABB_Iterador(){
-            _actual = _raiz;
+            _actual = _raíz;
             while(_actual.izq != null){
                 _actual = _actual.izq; 
             }
@@ -188,8 +258,8 @@ class ABB<T extends Comparable<T>> {
             return _actual.valor.compareTo(maximo()) != 0;
         }
     
-        public T siguiente() {            
-            T devolver = _actual.valor;
+        public Usuario siguiente() {            
+            Usuario devolver = _actual.valor;
             if(haySiguiente()){
                 //caso si tiene derecha
                 if(_actual.der != null){

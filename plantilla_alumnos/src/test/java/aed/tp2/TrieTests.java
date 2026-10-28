@@ -9,7 +9,7 @@ public class TrieTests {
 
     @Test
     void crearTrie() {
-        Trie tr = new Trie();
+        TrieMalo tr = new TrieMalo();
         assertEquals(1, tr.tamaño());
 
         assertTrue(tr.pertenece("No promo"));
@@ -19,7 +19,7 @@ public class TrieTests {
 
     @Test
     void crearPromoConTope() {
-        Trie tr = new Trie();
+        TrieMalo tr = new TrieMalo();
         assertEquals(1, tr.tamaño());
 
         tr.agregar("No limits", 3.15, 100000);
