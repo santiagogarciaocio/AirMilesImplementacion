@@ -4,14 +4,14 @@ import aed.tp2.ABBUsuarios.ABB_Iterador;
 
 public class AirMiles implements SistemaAirMiles {
     /*COMPLETAR*/
-    private Trie promociones;
+    private TriePromociones promociones;
     private ABBUsuarios usuarios;
     private Heap<Handle<Usuario>> ranking;
     private Usuario masAcumulador;
     private Usuario masCanjeador;
 
     public AirMiles() {
-        promociones = new Trie();
+        promociones = new TriePromociones();
         usuarios = new ABBUsuarios();
         ranking = new Heap<Handle<Usuario>>();
         masAcumulador = null; /*aca los test piden Usuario ficticion con ID -1 */
@@ -36,11 +36,18 @@ public class AirMiles implements SistemaAirMiles {
 
     public void acumularMillas(int id, double distancia, String nombrePromo) {        
         Usuario us = usuarios.usuario(id);
+        Promocion promocion = promociones.promocion(nombrePromo);
         double categoria = us.categoria();
-        double factor = 1 /*No tiene funcion buscar el trie */;
+        double factor = promocion.factor();
         double millas = distancia * categoria * factor;
         us.acumularMillas(millas);
         /*Hay qe chequear que el heap siga cumpliendo su abstraccion */
+        if(promocion.tieneTope()){
+            promocion.restarTope(distancia);
+            if(promocion.tope() == 0){
+                promociones.eliminar(nombrePromo);
+            }
+        }
         if(us.totales() > masAcumulador.totales()){
             masAcumulador = us;
         }
@@ -98,7 +105,7 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public void iniciarPromocion(String nombre, double factor) {
-        throw new UnsupportedOperationException("Sin implementar");
+        promociones.agregarPromocion(nombre, factor);
     }
 
     public void iniciarPromocionConTope(String nombre, double factor, double tope) {
@@ -106,7 +113,7 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public void finalizarPromocion(String nombre) {
-        throw new UnsupportedOperationException("Sin implementar");
+        promociones.eliminar(nombre);
     }
 
     public int elMasAcumulador() {
