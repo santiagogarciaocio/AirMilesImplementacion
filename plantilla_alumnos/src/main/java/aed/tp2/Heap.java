@@ -1,11 +1,13 @@
 package aed.tp2;
 
-class Heap<T> {
-    private Vector<T> _data;
+import java.util.ArrayList;
+
+class Heap<T extends Comparable<T>> {
+    private ArrayList<T> _data;
     private int _tamaño;
 
     public Heap() {
-        _data = new Vector<T>();
+        _data = new ArrayList<T>();
         _tamaño = 0;
     }
 
@@ -13,50 +15,50 @@ class Heap<T> {
         return _tamaño;
     }
 
-    public Handle<Usuario> máximo () {
+    public T máximo () {
         if(_tamaño == 0) {throw new UnsupportedOperationException("Vacío");}
-        return _data.obtener(0);
+        return _data.get(0);
     }
 
-    public void agregar(Handle<Usuario> u) {
+    public void agregar(T u) {
         _tamaño += 1;
-        _data.agregarAtras(u);
-        int posActual = _data.longitud() - 1;
-        while (_data.obtener(posActual).valor().disponibles() > _data.obtener((posActual - 1)/ 2).valor().disponibles()) { // Mientras tenga más millas disponibles que su padre
-            _data.modificarPosicion(posActual, _data.obtener((posActual - 1)/ 2));
-            _data.modificarPosicion((posActual - 1)/2, u);
+        _data.add(u);
+        int posActual = _data.size() - 1;
+        while (_data.get(posActual).compareTo(_data.get((posActual - 1)/ 2)) > 0) { // Mientras tenga más millas disponibles que su padre
+            _data.set(posActual, _data.get((posActual - 1)/ 2));
+            _data.set((posActual - 1)/2, u);
             posActual = (posActual - 1)/2;
         }
     }
 
-    public Handle<Usuario> sacarMáximo() {
+    public T sacarMáximo() {
         if(_tamaño == 0) {throw new UnsupportedOperationException("Vacío");}
         _tamaño -= 1;
-        Handle<Usuario> res = _data.obtener(0);
-        Handle<Usuario> último = _data.obtener(_data.longitud() - 1);
-        _data.modificarPosicion(0, último);
-        _data.eliminar(_data.longitud() - 1);
+        T res = _data.get(0);
+        T último = _data.get(_data.size() - 1);
+        _data.set(0, último);
+        _data.remove(_data.size() - 1);
         int posActual = 0;
         boolean hayUnHijoMayorQueElPadre = true;
-        while (_data.longitud() > 2*posActual + 2 && hayUnHijoMayorQueElPadre) { // Mientras tenga 2 hijos y no sean ambos menores que él
+        while (_data.size() > 2*posActual + 2 && hayUnHijoMayorQueElPadre) { // Mientras tenga 2 hijos y no sean ambos menores que él
             int posHijoIzq = 2*posActual + 1;
             int posHijoDer = 2*posActual + 2;
             int posHijoMayor = posHijoDer;
-            if (_data.obtener(posHijoIzq).valor().disponibles() > _data.obtener(posHijoDer).valor().disponibles()) {
+            if (_data.get(posHijoIzq).compareTo(_data.get(posHijoDer)) > 0) {
                 posHijoMayor = posHijoIzq;
             }
-            if (_data.obtener(posHijoMayor).valor().disponibles() > último.valor().disponibles()) {
-                _data.modificarPosicion(posActual, _data.obtener(posHijoMayor));
-                _data.modificarPosicion(posHijoMayor, último);
+            if (_data.get(posHijoMayor).compareTo(último) > 0) {
+                _data.set(posActual, _data.get(posHijoMayor));
+                _data.set(posHijoMayor, último);
                 posActual = posHijoMayor;
             }
             else {hayUnHijoMayorQueElPadre = false;}
         }
-        if (_data.longitud() > 2*posActual + 1) {
+        if (_data.size() > 2*posActual + 1) {
             int posHijo = 2*posActual +1;
-            if (_data.obtener(posHijo).valor().disponibles() > _data.obtener(posActual).valor().disponibles()) {
-                _data.modificarPosicion(posActual, _data.obtener(posHijo));
-                _data.modificarPosicion(posHijo, último);
+            if (_data.get(posHijo).compareTo(_data.get(posActual)) > 0) {
+                _data.set(posActual, _data.get(posHijo));
+                _data.set(posHijo, último);
                 posActual = posHijo;
             }
         }
