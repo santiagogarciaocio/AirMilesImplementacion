@@ -184,7 +184,16 @@ class Usuario implements Comparable<Usuario> {
 
     @Override 
     public int compareTo(Usuario usuario){
-        return this.ID - usuario.ID;
+        double diferencia = this.Disponibles - usuario.Disponibles;
+        if (diferencia > 0){
+            return 1;            
+        }
+        else if (diferencia < 0){
+            return -1;
+        }
+        else {
+            return this.ID - usuario.ID;
+        }
     }
 
     @Override 
