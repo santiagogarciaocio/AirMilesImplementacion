@@ -1,51 +1,110 @@
 package aed.tp2;
 
+import aed.tp2.ABBUsuarios.ABB_Iterador;
+
 public class AirMiles implements SistemaAirMiles {
     /*COMPLETAR*/
-    private Trie promociones;
-    private ABB usuarios;
-    private Heap ranking;
+    private TriePromociones promociones;
+    private ABBUsuarios usuarios;
+    private Heap<Handle<Usuario>> ranking;
     private Usuario masAcumulador;
     private Usuario masCanjeador;
 
     public AirMiles() {
-        throw new UnsupportedOperationException("Sin implementar");
+        promociones = new TriePromociones();
+        promociones.agregar("NoPromo",1);
+        usuarios = new ABBUsuarios();
+        ranking = new Heap<Handle<Usuario>>();
     }
 
     public void registrarUsuario(int id) {
-        throw new UnsupportedOperationException("Sin implementar");
+        Handle<Usuario> nuevoUsuario = usuarios.insertar(new Usuario(id));
+        ranking.agregar(nuevoUsuario);
     }
 
     public void registrarUsuarioConReferidor(int id, int ref) {
-        throw new UnsupportedOperationException("Sin implementar");
+        Handle<Usuario> nuevoUsuario = usuarios.insertar(new Usuario(id,true));
+        ranking.agregar(nuevoUsuario);
+        Usuario referidor = usuarios.usuario(ref);
+        referidor.acumularMillas(500);
+        /*Hay qe chequear que el heap siga cumpliendo su abstraccion */
+        if(referidor.totales() > masAcumulador.totales()){
+            masAcumulador = referidor;
+        }
     }
 
-    public void acumularMillas(int id, double distancia, String nombrePromo) {
-        throw new UnsupportedOperationException("Sin implementar");
+    public void acumularMillas(int id, double distancia, String nombrePromo) {        
+        Usuario us = usuarios.usuario(id);
+        Promocion promocion = promociones.promocion(nombrePromo);
+        double categoria = us.categoria();
+        double factor = promocion.factor();
+        double millas = distancia * categoria * factor;
+        us.acumularMillas(millas);
+        /*Hay qe chequear que el heap siga cumpliendo su abstraccion */
+        if(promocion.tieneTope()){
+            promocion.restarTope(distancia);
+            if(promocion.tope() == 0){
+                promociones.eliminar(nombrePromo);
+            }
+        }
+        if(us.totales() > masAcumulador.totales()){
+            masAcumulador = us;
+        }
     }
 
     public void canjearMillas(int id, double cantidad) {
-        throw new UnsupportedOperationException("Sin implementar");
+        Usuario us = usuarios.usuario(id);
+        us.canjearMillas(cantidad);
+        /*Hay qe chequear que el heap siga cumpliendo su abstraccion */        
+        if(us.canjeadas() > masCanjeador.canjeadas()){
+            masCanjeador = us;
+        }
     }
 
     public void transferirMillas(int origen, int destino, double cantidad) {
-        throw new UnsupportedOperationException("Sin implementar");
+        Usuario transferidor = usuarios.usuario(origen);
+        Usuario receptor = usuarios.usuario(destino);
+        transferidor.transferencia(receptor, cantidad);
+        /*Aca hay que chequear que si el transferidor era el masACumulador, y por haber canjeado dejo de serlo. El masAcumulador tiene que ser actualizarse */
+        if(transferidor.ID() == masCanjeador.ID()){
+        }else{}
+        if(transferidor.canjeadas() > masCanjeador.canjeadas()){
+            masCanjeador = transferidor;
+        }
+        if(receptor.totales() > masAcumulador.totales()){
+            masAcumulador = receptor;
+        }        
     }
 
     public double consultarSaldo(int id) {
-        throw new UnsupportedOperationException("Sin implementar");
+        Usuario us = usuarios.usuario(id);
+        return us.disponibles();
     }
 
     public String consultarCategoria(int id) {
-       throw new UnsupportedOperationException("Sin implementar");
+        Usuario us = usuarios.usuario(id);
+        return us.categoriaStrg();
     }
 
     public int[] rankingMillas(int n) {
-        throw new UnsupportedOperationException("Sin implementar");
+        int [] res;
+        if(n > ranking.tamaño()){
+            res = new int[ranking.tamaño()];
+        }else{
+            res = new int[n];
+        }
+        int puntero = 0;
+        while(puntero < n){
+            Handle<Usuario> us = ranking.sacarMáximo();
+            res[puntero] = us.valor().ID();
+        }
+        /*aca falta volver a agregar los usuarios al heap */
+        return res;
+        
     }
 
     public void iniciarPromocion(String nombre, double factor) {
-        throw new UnsupportedOperationException("Sin implementar");
+        promociones.agregarPromocion(nombre, factor);
     }
 
     public void iniciarPromocionConTope(String nombre, double factor, double tope) {
@@ -53,18 +112,31 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public void finalizarPromocion(String nombre) {
-        throw new UnsupportedOperationException("Sin implementar");
+        promociones.eliminar(nombre);
     }
 
     public int elMasAcumulador() {
-        throw new UnsupportedOperationException("Sin implementar");
+        return masAcumulador.ID();
     }
 
     public int elMasCanjeador() {
-        throw new UnsupportedOperationException("Sin implementar");
+        return masCanjeador.ID();
     }
 
     public int[][] paresTransferidoresExclusivos() {
-        throw new UnsupportedOperationException("Sin implementar");
+        int[][] res = new int[0][2];
+        
+        ABBUsuarios.ABB_Iterador iterador = usuarios.new ABB_Iterador();
+        while(iterador.haySiguiente()){
+            Usuario us = iterador.siguiente();
+            if(us.estaEnParejaTransferidoresExclusivos()){
+                if(us.ID() < us.parejaTransferidoraExclusiva()){
+                    res = new int[res.length+1][2];
+                    res[res.length][0] = us.ID();
+                    res[res.length][0] = us.parejaTransferidoraExclusiva();
+                }
+            }
+        }             
+        return res;        
     }
 }
