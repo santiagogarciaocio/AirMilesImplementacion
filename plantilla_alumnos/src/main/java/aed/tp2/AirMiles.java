@@ -12,10 +12,9 @@ public class AirMiles implements SistemaAirMiles {
 
     public AirMiles() {
         promociones = new TriePromociones();
+        promociones.agregar("NoPromo",1);
         usuarios = new ABBUsuarios();
         ranking = new Heap<Handle<Usuario>>();
-        masAcumulador = null; /*aca los test piden Usuario ficticion con ID -1 */
-        masCanjeador = null; /*aca los test piden Usuario ficticion con ID -1 */
     }
 
     public void registrarUsuario(int id) {
