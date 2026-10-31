@@ -108,7 +108,7 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public void iniciarPromocionConTope(String nombre, double factor, double tope) {
-        throw new UnsupportedOperationException("Sin implementar");
+        promociones.agregar(nombre, factor, tope);
     }
 
     public void finalizarPromocion(String nombre) {

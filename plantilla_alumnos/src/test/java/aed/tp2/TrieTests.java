@@ -11,19 +11,44 @@ public class TrieTests {
     void crearTrie() {
         Trie tr = new Trie();
 
-        assertTrue(tr.pertenece("No promo"));
-        assertFalse(tr.pertenece("Super Promo"));
-    }
+        
+        tr.agregar("nopromo",1);
 
+        assertTrue(tr.pertenece("nopromo"));
+    }
 
     @Test
     void crearPromoConTope() {
         Trie tr = new Trie();
 
-        tr.agregar("No limits", 3.15, 100000);
+        tr.agregar("nolimits", 3.15, 100000);
 
-        assertTrue(tr.pertenece("No limits"));
+        assertTrue(tr.pertenece("nolimits"));
         assertFalse(tr.pertenece("No limitss"));
     }
 
+    @Test
+    void eliminarPromo() {
+        Trie tr = new Trie();
+        tr.agregar("nolimits", 3.15, 100000);
+
+        assertTrue(tr.pertenece("nolimits"));
+
+        tr.eliminar("nolimits");
+
+        assertFalse(tr.pertenece("nolimits"));
+
+    }
+
+    @Test
+    void modificarPromo() {
+        Trie tr = new Trie();
+
+        tr.agregar("nolimits", 3.15, 100000);
+        
+        Promocion prm = tr.promocion("nolimits");
+        prm.restarTope(50000);
+        assertEquals(50000,tr.promocion("nolimits").tope());
+
+    }
 }
