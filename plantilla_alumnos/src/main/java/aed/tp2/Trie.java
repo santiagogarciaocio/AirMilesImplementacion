@@ -51,7 +51,7 @@ public class Trie {
                 i++;
             }
         }
-        return nodo_actual.promo != null;
+        return nodo_actual.promo.estaActiva();
     }
 
     public void agregar(String promocion, double factor) {
@@ -78,7 +78,7 @@ public class Trie {
             nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));
             i++;
         }
-        nodo_actual.promo = null;
+        nodo_actual.promo.eliminar();
     }
 
 }
