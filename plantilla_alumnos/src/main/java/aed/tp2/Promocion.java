@@ -15,7 +15,7 @@ public class Promocion {
         this.estaActiva = true;
     }
 
-    public Promocion(String nombre, double factor, int tope){
+    public Promocion(String nombre, double factor, double tope){
         this.nombre = nombre;
         this.factor = factor;
         this.tieneTope = true;
@@ -39,15 +39,15 @@ public class Promocion {
         return this.tope;
     }
 
-    public boolean sePasaDelTope(int millas){
+    public boolean sePasaDelTope(double millas){
         return millas > this.tope;
     }
 
-    public boolean igualAlTope(int millas){
+    public boolean igualAlTope(double millas){
         return millas == this.tope;
     }
 
-    public void restarTope(int millas){
+    public void restarTope(double millas){
         this.tope = this.tope - millas;
     }
 

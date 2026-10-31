@@ -4,14 +4,14 @@ import aed.tp2.ABBUsuarios.ABB_Iterador;
 
 public class AirMiles implements SistemaAirMiles {
     /*COMPLETAR*/
-    private TriePromociones promociones;
+    private Trie promociones;
     private ABBUsuarios usuarios;
     private Heap<Handle<Usuario>> ranking;
     private Usuario masAcumulador;
     private Usuario masCanjeador;
 
     public AirMiles() {
-        promociones = new TriePromociones();
+        promociones = new Trie();
         promociones.agregar("NoPromo",1);
         usuarios = new ABBUsuarios();
         ranking = new Heap<Handle<Usuario>>();
@@ -104,7 +104,7 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public void iniciarPromocion(String nombre, double factor) {
-        promociones.agregarPromocion(nombre, factor);
+        promociones.agregar(nombre, factor);
     }
 
     public void iniciarPromocionConTope(String nombre, double factor, double tope) {

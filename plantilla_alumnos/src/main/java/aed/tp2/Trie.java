@@ -71,6 +71,23 @@ public class Trie {
         return;
     }
 
+    public void agregar(String promocion, double factor, double tope) {
+        int i = 0;
+        Nodo nodo_actual = raiz;
+        while (i < promocion.length()) {
+            if (nodo_actual.haySiguiente(promocion.charAt(i))) {
+                nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));
+                i++;
+            }
+            else {
+                nodo_actual = nodo_actual.agregarNodo(promocion.charAt(i));
+                i++;
+            }
+        }
+        nodo_actual.promo = new Promocion(promocion, factor, tope);
+        return;
+    }
+
     public void eliminar(String promocion) {
         int i = 0;
         Nodo nodo_actual = raiz;
@@ -79,6 +96,17 @@ public class Trie {
             i++;
         }
         nodo_actual.promo.eliminar();
+    }
+
+    public Promocion promocion(String promocion) {
+        int i = 0;
+        Nodo nodo_actual = raiz;
+        while (i < promocion.length()) {
+            nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));
+            i++;
+            
+        }
+        return nodo_actual.promo;
     }
 
 }
