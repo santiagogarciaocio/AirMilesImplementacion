@@ -4,13 +4,15 @@ public class Promocion {
     private String nombre;
     private double factor;
     private boolean tieneTope;
-    private double tope; 
+    private double tope;
+    private boolean estaActiva;
 
     public Promocion(String nombre, double factor){
         this.nombre = nombre;
         this.factor = factor;
         this.tieneTope = false;
         this.tope = Double.POSITIVE_INFINITY;
+        this.estaActiva = true;
     }
 
     public Promocion(String nombre, double factor, int tope){
@@ -18,6 +20,7 @@ public class Promocion {
         this.factor = factor;
         this.tieneTope = true;
         this.tope = tope;
+        this.estaActiva = true;
     }
 
     public String nombre(){
@@ -46,6 +49,14 @@ public class Promocion {
 
     public void restarTope(int millas){
         this.tope = this.tope - millas;
+    }
+
+    public void eliminar(){
+        this.estaActiva = false;
+    }
+
+    public boolean estaActiva(){
+        return this.estaActiva;
     }
 
 }
