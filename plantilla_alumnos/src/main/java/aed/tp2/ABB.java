@@ -54,6 +54,10 @@ class ABB<T> {
             boolean res = this.valor().compareTo(otroHandle.valor()) == 0;
             return res;
         }
+
+        public void cambiarIndice(int i) {
+            indiceHeap = i;
+        }
     }
 
     public ABB() {
