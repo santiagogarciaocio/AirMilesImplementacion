@@ -30,6 +30,7 @@ public class TrieTests {
     @Test
     void eliminarPromo() {
         Trie tr = new Trie();
+        tr.agregar("nopromo",1);
         tr.agregar("nolimits", 3.15, 100000);
 
         assertTrue(tr.pertenece("nolimits"));
