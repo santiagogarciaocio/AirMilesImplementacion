@@ -7,60 +7,17 @@ class ABB<T> {
 
     private class Nodo {
         int ID;
-        HandleABB handle;
+        Handle<T> handle;
         Nodo izq;
         Nodo der;
         Nodo padre;
 
-        Nodo (int id, HandleABB handle) {
+        Nodo (int id, Handle<T> handle) {
             this.ID = id;
             this.handle = handle;
             izq = null;
             der = null;
             padre = null;
-        }
-    }
-    
-    private class HandleABB implements Handle<T>{
-        private T usuario; // acá le puse usuario porque es para lo que lo vamos a usar, pero como es paramétrico capaz sea mejor llamarlo elemento
-        private int indiceHeap; // esta va a ser la posición del usuario en el heap
-
-        private HandleABB(T elem, int indice){
-            this.usuario = elem;
-            this.indiceHeap = indice;
-        }
-
-        public T valor(){
-            return this.usuario;
-        }
-
-        public void eliminar(){            
-            ABB.this.eliminarNodo(this.usuario);
-        }
-
-        public int compareTo(Handle<T> otroHandle){ // hace falta un compareTo de handles si vamos a recorrer el árbol por IDs?
-            return this.valor().compareTo(otroHandle.valor());
-        }
-
-        public String toString(){            
-            return ABB.this.toString();
-        }
-
-        public void modificar (T v) {
-            this.usuario = v;
-        }
-
-        public boolean equals (Handle<T> otroHandle) { // en qué caso serían iguales 2 handles? si tienen el mismo usuario? 
-            boolean res = this.valor().compareTo(otroHandle.valor()) == 0;
-            return res;
-        }
-
-        public int posicionEnHeap(){
-            return indiceHeap;
-        }
-
-        public void cambiarIndice(int i) {
-            indiceHeap = i;
         }
     }
 
@@ -73,20 +30,20 @@ class ABB<T> {
         return _cardinal;
     }
 
-    public int minimo(){
+    public Handle<T> minimo(){
         Nodo actual = _raíz;
         while(! (actual.izq == null)){
             actual = actual.izq;
         }
-        return actual.ID;
+        return actual.handle;
     }
 
-    public int maximo(){
+    public Handle<T> maximo(){
         Nodo actual = _raíz;
         while(! (actual.der == null)){
             actual = actual.der;
         }
-        return actual.ID;        
+        return actual.handle;        
     }
 
     public boolean pertenece(T elem){ // esta creo que no se puede hacer en O(log n) ya que hay que recorrer todos los nodos
@@ -106,9 +63,9 @@ class ABB<T> {
         }
         Nodo actual = _raíz;        
         while (actual != null) {         
-            if (id < actual.valor.ID()) {
+            if (id < actual.ID) {
                 actual = actual.izq;
-            } else if (id > actual.valor.ID()) {
+            } else if (id > actual.ID) {
                 actual = actual.der;
             } else {
                 return true;
@@ -134,16 +91,12 @@ class ABB<T> {
         }        
     }
 
-    public Handle<T> insertar(int id, T elem, int ultimaPosDelHeap){ // cuando inserte lo voy a poner abajo de todo a la izq en el heap, y después lo voy a acomodar
-        if(pertenece(id)){ 
-            return null;
-        }
-        HandleABB nuevoHandle = new HandleABB(elem, ultimaPosDelHeap);
-        Nodo nuevo = new Nodo(id, nuevoHandle);        
+    public void insertar(int id, Handle<T> elem){ //asumimos que no te pueden pasar un usuario repetido por el requiere
+        Nodo nuevo = new Nodo(id, elem);        
         if(_raíz == null){
             _raíz = nuevo; 
             _cardinal ++;
-            return nuevoHandle;
+            return; 
         }
         else{
             Nodo actual = _raíz;        
@@ -155,7 +108,7 @@ class ABB<T> {
                         actual.izq = nuevo;
                         nuevo.padre = actual;
                         _cardinal ++;
-                        return nuevoHandle;
+                        return;
                     }
                 }
                 else{
@@ -165,7 +118,7 @@ class ABB<T> {
                         actual.der = nuevo;
                         nuevo.padre = actual;
                         _cardinal ++;
-                        return nuevoHandle;
+                        return;
                     }
                 }}}
     }
