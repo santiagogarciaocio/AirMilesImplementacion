@@ -3,11 +3,11 @@ package aed.tp2;
 import java.util.ArrayList;
 
 class Heap<T extends Comparable<T>> {
-    private ArrayList<Handle<T>> _data;
+    private ArrayList<T> _data;
     private int _tamaño;
 
     public Heap() {
-        _data = new ArrayList<Handle<T>>();
+        _data = new ArrayList<T>();
         _tamaño = 0;
     }
 
@@ -15,27 +15,28 @@ class Heap<T extends Comparable<T>> {
         return _tamaño;
     }
 
-    public Handle<T> máximo () {
+    public T máximo () {
         if(_tamaño == 0) {throw new UnsupportedOperationException("Vacío");}
         return _data.get(0);
     }
 
-    public void agregar(Handle<T> u) {
+    public Handle<T> agregar(T u) {
         _tamaño += 1;
         _data.add(u);
         int posActual = _data.size() - 1;
-        while (_data.get(posActual).valor().compareTo(_data.get((posActual - 1)/ 2).valor()) > 0) { // Mientras tenga más millas disponibles que su padre
+        while (_data.get(posActual).compareTo(_data.get((posActual - 1)/ 2)) > 0) { // Mientras tenga más millas disponibles que su padre
             _data.set(posActual, _data.get((posActual - 1)/ 2));
             _data.set((posActual - 1)/2, u);
             posActual = (posActual - 1)/2;
         }
+        return new HandleHeap(u);
     }
 
-    public Handle<T> sacarMáximo() {
+    public T sacarMáximo() {
         if(_tamaño == 0) {throw new UnsupportedOperationException("Vacío");}
         _tamaño -= 1;
-        Handle<T> res = _data.get(0);
-        Handle<T> último = _data.get(_data.size() - 1);
+        T res = _data.get(0);
+        T último = _data.get(_data.size() - 1);
         _data.set(0, último);
         _data.remove(_data.size() - 1);
         int posActual = 0;
@@ -44,10 +45,10 @@ class Heap<T extends Comparable<T>> {
             int posHijoIzq = 2*posActual + 1;
             int posHijoDer = 2*posActual + 2;
             int posHijoMayor = posHijoDer;
-            if (_data.get(posHijoIzq).valor().compareTo(_data.get(posHijoDer).valor()) > 0) {
+            if (_data.get(posHijoIzq).compareTo(_data.get(posHijoDer)) > 0) {
                 posHijoMayor = posHijoIzq;
             }
-            if (_data.get(posHijoMayor).valor().compareTo(último.valor()) > 0) {
+            if (_data.get(posHijoMayor).compareTo(último) > 0) {
                 _data.set(posActual, _data.get(posHijoMayor));
                 _data.set(posHijoMayor, último);
                 posActual = posHijoMayor;
@@ -56,7 +57,7 @@ class Heap<T extends Comparable<T>> {
         }
         if (_data.size() > 2*posActual + 1) {
             int posHijo = 2*posActual +1;
-            if (_data.get(posHijo).valor().compareTo(_data.get(posActual).valor()) > 0) {
+            if (_data.get(posHijo).compareTo(_data.get(posActual)) > 0) {
                 _data.set(posActual, _data.get(posHijo));
                 _data.set(posHijo, último);
                 posActual = posHijo;
@@ -65,23 +66,22 @@ class Heap<T extends Comparable<T>> {
         return res;
     }
 
-    public void agregarAlFinal(Handle<T> u) {
+    public Handle<T> agregarAlFinal(T u) {
         _tamaño += 1;
         _data.add(u);
+        return new HandleHeap(u);
     }
 
     private void intercambiar(int i, int j) {
-        Handle<T> h = _data.get(i);
+        T h = _data.get(i);
         _data.set(i, _data.get(j));
-        _data.set(j, h);
-        ((ABB<T>.HandleABB) _data.get(i)).cambiarIndice(i);
-        ((ABB<T>.HandleABB) _data.get(j)).cambiarIndice(j); 
+        _data.set(j, h); 
     }
 
     public void siftUp(int i) {
         while (i > 0) {
             int padre = (i - 1)/ 2;
-            if (_data.get(i).valor().compareTo(_data.get(padre).valor()) > 0) {
+            if (_data.get(i).compareTo(_data.get(padre)) > 0) {
                 intercambiar(i, padre);
             }
             else return; 
@@ -93,13 +93,13 @@ class Heap<T extends Comparable<T>> {
             int izq = (i * 2) + 1;
             int der = (i * 2) + 2;
             int hijoMayor;
-            if (der < _tamaño && _data.get(der).valor().compareTo(_data.get(izq).valor()) > 0) {
+            if (der < _tamaño && _data.get(der).compareTo(_data.get(izq)) > 0) {
                 hijoMayor = der;
             }
             else {
                 hijoMayor = izq;
             }
-            if (_data.get(i).valor().compareTo(_data.get(hijoMayor).valor()) < 0) {
+            if (_data.get(i).compareTo(_data.get(hijoMayor)) < 0) {
                 intercambiar(i, hijoMayor);
                 i = hijoMayor;
             }
@@ -107,4 +107,45 @@ class Heap<T extends Comparable<T>> {
                 return; 
             }
         }}
+
+    public class HandleHeap implements Handle<T>{
+        private T usuario;
+
+        private HandleHeap(T elem){
+            this.usuario = elem;
+        }
+
+        public T valor(){
+            return this.usuario;
+        }
+
+        public void eliminar(){            
+            ABB.this.eliminarNodo(this.usuario);
+        }
+
+        public int compareTo(Handle<T> otroHandle){
+            return this.valor().compareTo(otroHandle.valor());
+        }
+
+        public String toString(){            
+            return ABB.this.toString();
+        }
+
+        public void modificar (T v) {
+            this.usuario = v;
+        }
+
+        public boolean equals (Handle<T> otroHandle) {
+            boolean res = this.valor().compareTo(otroHandle.valor()) == 0;
+            return res;
+        }
+
+        public int posicionEnHeap() {
+            return indiceHeap;
+        }
+
+        public void cambiarIndice(int i) {
+            indiceHeap = i;
+        }
+    }
 }
