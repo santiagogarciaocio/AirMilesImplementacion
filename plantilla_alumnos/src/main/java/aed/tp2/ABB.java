@@ -55,6 +55,10 @@ class ABB<T> {
             return res;
         }
 
+        public int posicionEnHeap(){
+            return indiceHeap;
+        }
+
         public void cambiarIndice(int i) {
             indiceHeap = i;
         }
