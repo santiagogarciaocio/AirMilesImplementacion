@@ -72,41 +72,13 @@ class Heap<T extends Comparable<T>> {
         return new HandleHeap(u);
     }
 
-    private void intercambiar(int i, int j) {
-        T h = _data.get(i);
-        _data.set(i, _data.get(j));
-        _data.set(j, h); 
+    public T getData(int i) {
+        return _data.get(i);
     }
 
-    public void siftUp(int i) {
-        while (i > 0) {
-            int padre = (i - 1)/ 2;
-            if (_data.get(i).compareTo(_data.get(padre)) > 0) {
-                intercambiar(i, padre);
-            }
-            else return; 
-        }
+    public void setearData(int i, T elem) {
+        _data.set(i, elem);
     }
-
-    public void siftDown(int i) {
-        while ((i * 2) + 1 < _tamaño) {
-            int izq = (i * 2) + 1;
-            int der = (i * 2) + 2;
-            int hijoMayor;
-            if (der < _tamaño && _data.get(der).compareTo(_data.get(izq)) > 0) {
-                hijoMayor = der;
-            }
-            else {
-                hijoMayor = izq;
-            }
-            if (_data.get(i).compareTo(_data.get(hijoMayor)) < 0) {
-                intercambiar(i, hijoMayor);
-                i = hijoMayor;
-            }
-            else {
-                return; 
-            }
-        }}
 
     public class HandleHeap implements Handle<T>{
         private T usuario;
