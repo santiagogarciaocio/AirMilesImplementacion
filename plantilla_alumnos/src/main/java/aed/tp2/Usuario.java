@@ -8,7 +8,8 @@ class Usuario implements Comparable<Usuario> {
     private Usuario ultimoUsuarioTransferido;
     private boolean esTransferidorExlusivo;
     private Usuario ultimoUsuarioRecibido;
-    private boolean esReceptorExlusivo; 
+    private boolean esReceptorExlusivo;
+    private int indiceHeap;
     /* guardar la informacion completa de enviadas y recibidas/ de si es trasnferidos y receptor exlusivao
     Entonces cuando estamos recorriendo el ABB para 'paresTransferidoresExlusivos' y vemos que efectivamente es trasnfereridor exclusivo. 
     si es menor a su pareja lo ponemos en la lista
@@ -47,6 +48,14 @@ class Usuario implements Comparable<Usuario> {
 
     public int ID(){
         return this.ID;
+    }
+
+    public int indiceHeap(){
+        return indiceHeap;
+    }
+
+    public void setIndiceHeap(int i){
+        indiceHeap = i;
     }
     
     public double totales(){
