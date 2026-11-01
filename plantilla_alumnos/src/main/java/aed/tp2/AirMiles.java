@@ -136,7 +136,7 @@ public class AirMiles implements SistemaAirMiles {
     public int[][] paresTransferidoresExclusivos() {
         int[][] res = new int[0][2];
         
-        ABBUsuarios.ABB_Iterador iterador = usuarios.new ABB_Iterador();
+        ABB.ABB_Iterador iterador = usuarios.new ABB_Iterador();
         while(iterador.haySiguiente()){
             Usuario us = iterador.siguiente();
             if(us.estaEnParejaTransferidoresExclusivos()){
@@ -149,4 +149,43 @@ public class AirMiles implements SistemaAirMiles {
         }             
         return res;        
     }
+
+    private void intercambiar(int i, int j) {
+        Usuario g = ranking.getData(j);
+        Usuario h = ranking.getData(i);
+        ranking.setearData(i, g);
+        ranking.setearData(j, h);
+        g.setIndiceHeap(i);
+        h.setIndiceHeap(j); 
+    }
+
+    public void siftUp(int i) {
+        while (i > 0) {
+            int padre = (i - 1)/ 2;
+            if (ranking.getData(i).compareTo(ranking.getData(padre)) > 0) {
+                intercambiar(i, padre);
+            }
+            else return; 
+        }
+    }
+
+    public void siftDown(int i) {
+        while ((i * 2) + 1 < ranking.tamaño()) {
+            int izq = (i * 2) + 1;
+            int der = (i * 2) + 2;
+            int hijoMayor;
+            if (der < ranking.tamaño() && ranking.getData(der).compareTo(ranking.getData(izq)) > 0) {
+                hijoMayor = der;
+            }
+            else {
+                hijoMayor = izq;
+            }
+            if (ranking.getData(i).compareTo(ranking.getData(hijoMayor)) < 0) {
+                intercambiar(i, hijoMayor);
+                i = hijoMayor;
+            }
+            else {
+                return; 
+            }
+        }}
 }
