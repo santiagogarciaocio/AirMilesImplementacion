@@ -1,92 +1,91 @@
 package aed.tp2;
 
-import aed.tp2.TrieMalo.Nodo;
-
-class ABBUsuarios {
+class ABB<T> {
 
     private Nodo _raíz;
     private int _cardinal;
-    private int _altura;
-    /*Altura no lo usamos para nada, lo podemos eliminar? */
 
     private class Nodo {
-        Usuario valor;
+        int ID;
+        HandleABB handle;
         Nodo izq;
         Nodo der;
         Nodo padre;
 
-        Nodo (Usuario v) {
-            valor = v;
+        Nodo (int id, HandleABB handle) {
+            this.ID = id;
+            this.handle = handle;
             izq = null;
             der = null;
             padre = null;
         }
     }
     
-    private class HandleABB implements Handle<Usuario>{
-        private Nodo nodo;
+    private class HandleABB implements Handle<T>{
+        private T usuario; // acá le puse usuario porque es para lo que lo vamos a usar, pero como es paramétrico capaz sea mejor llamarlo elemento
+        private int indiceHeap; // esta va a ser la posición del usuario en el heap
 
-        private HandleABB(Nodo n){
-            this.nodo = n;
+        private HandleABB(T elem, int indice){
+            this.usuario = elem;
+            this.indiceHeap = indice;
         }
 
-        public Usuario valor(){
-            return this.nodo.valor;
+        public T valor(){
+            return this.usuario;
         }
 
         public void eliminar(){            
-            ABBUsuarios.this.eliminarNodo(this.nodo.valor);
+            ABB.this.eliminarNodo(this.usuario);
         }
 
-        public int compareTo(Handle<Usuario> otroHandle){
+        public int compareTo(Handle<T> otroHandle){ // hace falta un compareTo de handles si vamos a recorrer el árbol por IDs?
             return this.valor().compareTo(otroHandle.valor());
         }
 
         public String toString(){            
-            return ABBUsuarios.this.toString();
+            return ABB.this.toString();
         }
 
-        public void modificar (Usuario v) {
-            this.nodo.valor = v;
+        public void modificar (T v) {
+            this.usuario = v;
         }
 
-        public boolean equals (Handle<Usuario> otroHandle) {
+        public boolean equals (Handle<T> otroHandle) { // en qué caso serían iguales 2 handles? si tienen el mismo usuario? 
             boolean res = this.valor().compareTo(otroHandle.valor()) == 0;
             return res;
         }
     }
 
-    public ABBUsuarios() {
+    public ABB() {
         _raíz = null;
         _cardinal = 0;
-        _altura = 0;
     }
 
     public int cardinal() {
         return _cardinal;
     }
 
-    public Usuario minimo(){
+    public int minimo(){
         Nodo actual = _raíz;
         while(! (actual.izq == null)){
             actual = actual.izq;
         }
-        return actual.valor;
+        return actual.ID;
     }
 
-    public Usuario maximo(){
+    public int maximo(){
         Nodo actual = _raíz;
         while(! (actual.der == null)){
             actual = actual.der;
         }
-        return actual.valor;        
+        return actual.ID;        
     }
 
-    public boolean pertenece(Usuario elem){
+    public boolean pertenece(T elem){ // esta creo que no se puede hacer en O(log n) ya que hay que recorrer todos los nodos
         return perteneceAux(_raíz, elem);
     }
 
-    private boolean perteneceAux (Nodo nodo, Usuario elem) {
+    private boolean perteneceAux (Nodo nodo, T elem) {
         if (nodo == null) {return false;}
         if (elem.compareTo(nodo.valor) == 0) {return true;}
         if (elem.compareTo(nodo.valor) > 0) {return perteneceAux (nodo.der, elem);}
@@ -101,7 +100,7 @@ class ABBUsuarios {
         while (actual != null) {         
             if (id < actual.valor.ID()) {
                 actual = actual.izq;
-            } else if (id < actual.valor.ID()) {
+            } else if (id > actual.valor.ID()) {
                 actual = actual.der;
             } else {
                 return true;
@@ -109,43 +108,46 @@ class ABBUsuarios {
         return false;
     }
 
-    public Usuario usuario(int id){
+    public T usuario(int id){
         if(! pertenece(id)){
             throw new UnsupportedOperationException("El usuario no existe");
         }
         else{
             Nodo actual = _raíz;
-            while(id != actual.valor.ID()){
-                if(id < actual.valor.ID()){
+            while(id != actual.ID){
+                if(id < actual.ID){
                     actual = actual.izq;
                 }
                 else{
                     actual = actual.der;
                 }
             }
-            return actual.valor;
+            return actual.handle.usuario;
         }        
     }
 
-    public Handle<Usuario> insertar(Usuario elem){
-        if(pertenece(elem)){
+    public Handle<T> insertar(int id, T elem, int ultimaPosDelHeap){ // cuando inserte lo voy a poner abajo de todo a la izq en el heap, y después lo voy a acomodar
+        if(pertenece(id)){ 
             return null;
         }
-        Nodo nuevo = new Nodo(elem);        
+        HandleABB nuevoHandle = new HandleABB(elem, ultimaPosDelHeap);
+        Nodo nuevo = new Nodo(id, nuevoHandle);        
         if(_raíz == null){
             _raíz = nuevo; 
-            _cardinal ++; 
+            _cardinal ++;
+            return nuevoHandle;
         }
         else{
             Nodo actual = _raíz;        
-            while(elem.compareTo(actual.valor) != 0){
-                if(elem.compareTo(actual.valor) < 0){
+            while(true){
+                if(id < actual.ID){
                     if(actual.izq != null){
                         actual = actual.izq;
                     }else{
                         actual.izq = nuevo;
                         nuevo.padre = actual;
                         _cardinal ++;
+                        return nuevoHandle;
                     }
                 }
                 else{
@@ -155,12 +157,12 @@ class ABBUsuarios {
                         actual.der = nuevo;
                         nuevo.padre = actual;
                         _cardinal ++;
+                        return nuevoHandle;
                     }
                 }}}
-        return new HandleABB (nuevo);
     }
 /* En ningun momento usamos eliminar. No parece ser una opcion de AirMilles eliminar un usuario */
-    public void eliminarNodo (Usuario elem) {
+    public void eliminarNodo (T elem) {
         if(!pertenece(elem)){ //si no pertenece no hago nada
             return;
         }
@@ -232,7 +234,7 @@ class ABBUsuarios {
         if(_cardinal == 0){return "{}";}
         else{
             String res = "{";
-            ABBUsuarios.ABB_Iterador iterador = new ABB_Iterador();
+            ABB<T>.ABB_Iterador iterador = new ABB_Iterador();
             while(iterador.haySiguiente()){
                 res = res+iterador.siguiente().toString();
                 if(iterador.haySiguiente()){res = res+",";}
@@ -255,11 +257,11 @@ class ABBUsuarios {
         }
 
         public boolean haySiguiente() {            
-            return _actual.valor.compareTo(maximo()) != 0;
+            return _actual.ID != maximo();
         }
     
-        public Usuario siguiente() {            
-            Usuario devolver = _actual.valor;
+        public int siguiente() {            
+            int devolver = _actual.ID;
             if(haySiguiente()){
                 //caso si tiene derecha
                 if(_actual.der != null){
@@ -271,7 +273,7 @@ class ABBUsuarios {
                 }else{
                     Nodo nuevoActual = _actual.padre;
                     Nodo valorAnterior = _actual;
-                    while(nuevoActual.izq.valor.compareTo(valorAnterior.valor) != 0){
+                    while(nuevoActual.izq.ID != valorAnterior.ID){
                         nuevoActual = nuevoActual.padre;
                         valorAnterior = valorAnterior.padre;
                     }
