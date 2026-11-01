@@ -112,7 +112,7 @@ class ABB<T> {
         return false;
     }
 
-    public T usuario(int id){
+    public Handle<T> buscar(int id){
         if(! pertenece(id)){
             throw new UnsupportedOperationException("El usuario no existe");
         }
@@ -126,7 +126,7 @@ class ABB<T> {
                     actual = actual.der;
                 }
             }
-            return actual.handle.usuario;
+            return actual.handle;
         }        
     }
 
