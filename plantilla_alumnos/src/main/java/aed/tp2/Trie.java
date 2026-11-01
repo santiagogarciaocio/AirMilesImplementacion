@@ -7,9 +7,11 @@ public class Trie {
     private class Nodo {
         private Nodo[] letras;
         private Promocion promo;
+        private int cantPromos;
 
         public Nodo() {
             letras = new Nodo[256];
+            cantPromos = 0;
         }
 
         public Nodo(Promocion promocion) {
@@ -59,10 +61,12 @@ public class Trie {
         Nodo nodo_actual = raiz;
         while (i < promocion.length()) {
             if (nodo_actual.haySiguiente(promocion.charAt(i))) {
+                nodo_actual.cantPromos ++;
                 nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));
                 i++;
             }
             else {
+                nodo_actual.cantPromos ++;
                 nodo_actual = nodo_actual.agregarNodo(promocion.charAt(i));
                 i++;
             }
@@ -76,15 +80,17 @@ public class Trie {
         Nodo nodo_actual = raiz;
         while (i < promocion.length()) {
             if (nodo_actual.haySiguiente(promocion.charAt(i))) {
+                nodo_actual.cantPromos ++;
                 nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));
                 i++;
             }
             else {
+                nodo_actual.cantPromos ++;
                 nodo_actual = nodo_actual.agregarNodo(promocion.charAt(i));
                 i++;
             }
         }
-        nodo_actual.promo = new Promocion(promocion, factor, tope);
+        nodo_actual.promo = new Promocion(promocion, factor, tope);        
         return;
     }
 
@@ -92,10 +98,27 @@ public class Trie {
         int i = 0;
         Nodo nodo_actual = raiz;
         while (i < promocion.length()) {
+            nodo_actual.cantPromos --;            
             nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));
-            i++;
+            if(nodo_actual.cantPromos == 1){
+                break;}
+            i++;            
+            }
+        if(i == promocion.length()){
+            nodo_actual.promo = null;
+        }else{
+            podar(promocion, i);
         }
-        nodo_actual.promo.eliminar();
+    }
+
+    private void podar(String promocion, int podarEn){
+        int i = 0;
+        Nodo nodo_actual = raiz;
+        while (i < podarEn) {
+            nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));            
+            i++;            
+            }
+        nodo_actual.letras[promocion.charAt(i)] = null;
     }
 
     public Promocion promocion(String promocion) {
