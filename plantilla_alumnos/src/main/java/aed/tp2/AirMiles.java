@@ -47,13 +47,13 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public void acumularMillas(int id, double distancia, String nombrePromo) {        
-        ABB<Usuario>.HandleABB us = (ABB<Usuario>.HandleABB) usuarios.buscar(id); //de nuevo, casteo a HandleABB porque esa es la clase que me permite saber su posición en el heap
+        Handle<Usuario> us = usuarios.buscar(id);
         Promocion promocion = promociones.promocion(nombrePromo);
         double categoria = us.valor().categoria();
         double factor = promocion.factor();
         double millas = distancia * categoria * factor;
         us.valor().acumularMillas(millas);
-        ranking.siftUp(us.posicionEnHeap());
+        ranking.siftUp(us.valor().indiceHeap());
         if(promocion.tieneTope()){
             promocion.restarTope(distancia);
             if(promocion.tope() == 0){
@@ -66,9 +66,9 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public void canjearMillas(int id, double cantidad) {
-        ABB<Usuario>.HandleABB us = (ABB<Usuario>.HandleABB) usuarios.buscar(id);
-        us.canjearMillas(cantidad);
-        ranking.siftDown(us.posicionEnHeap);        
+        Handle<Usuario> us = usuarios.buscar(id);
+        us.valor().canjearMillas(cantidad);
+        ranking.siftDown(us.valor().indiceHeap());       
         if(us.valor().canjeadas() > masCanjeador.canjeadas()){
             masCanjeador = us.valor();
         }
