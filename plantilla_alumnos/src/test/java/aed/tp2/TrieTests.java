@@ -42,6 +42,19 @@ public class TrieTests {
     }
 
     @Test
+    void eliminarPrefijo() {
+        Trie tr = new Trie();
+        
+        tr.agregar("nopromo",1);
+        tr.agregar("nopromociones",2);
+
+        tr.eliminar("nopromo");
+
+        assertFalse(tr.pertenece("nopromo"));
+        assertTrue(tr.pertenece("nopromociones"));
+    }
+
+    @Test
     void modificarPromo() {
         Trie tr = new Trie();
 
