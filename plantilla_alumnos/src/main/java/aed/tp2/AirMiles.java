@@ -1,63 +1,73 @@
 package aed.tp2;
 
-import aed.tp2.ABBUsuarios.ABB_Iterador;
+import aed.tp2.ABB.ABB_Iterador;
 
 public class AirMiles implements SistemaAirMiles {
     /*COMPLETAR*/
     private Trie promociones;
-    private ABBUsuarios usuarios;
-    private Heap<Handle<Usuario>> ranking;
+    private ABB<Usuario> usuarios;
+    private Heap<Usuario> ranking;
     private Usuario masAcumulador;
     private Usuario masCanjeador;
 
     public AirMiles() {
         promociones = new Trie();
         promociones.agregar("NoPromo",1);
-        usuarios = new ABBUsuarios();
-        ranking = new Heap<Handle<Usuario>>();
+        usuarios = new ABB<>();
+        ranking = new Heap<>();
     }
 
     public void registrarUsuario(int id) {
-        Handle<Usuario> nuevoUsuario = usuarios.insertar(new Usuario(id));
-        ranking.agregar(nuevoUsuario);
+        Usuario nuevoUsuario = new Usuario(id);
+        int posHeap = ranking.tamaño(); //primero lo meto al final
+        if (usuarios.cardinal() == 0) {
+            masAcumulador = nuevoUsuario;
+            masCanjeador = nuevoUsuario;
+        }
+        Handle<Usuario> handleNuevoUsuario = usuarios.insertar(id, nuevoUsuario, posHeap);
+        ranking.agregarAlFinal(handleNuevoUsuario);
+        ranking.siftUp(posHeap); //acá lo acomodo
     }
 
     public void registrarUsuarioConReferidor(int id, int ref) {
-        Handle<Usuario> nuevoUsuario = usuarios.insertar(new Usuario(id,true));
-        ranking.agregar(nuevoUsuario);
-        Usuario referidor = usuarios.usuario(ref);
-        referidor.acumularMillas(500);
-        /*Hay qe chequear que el heap siga cumpliendo su abstraccion */
-        if(referidor.totales() > masAcumulador.totales()){
-            masAcumulador = referidor;
+        int posHeap = ranking.tamaño();
+        Handle<Usuario> nuevoUsuario = usuarios.insertar(id, new Usuario(id,true), posHeap);
+        ranking.agregarAlFinal(nuevoUsuario);
+        ranking.siftUp(posHeap);
+        
+        ABB<Usuario>.HandleABB referidor = (ABB<Usuario>.HandleABB) usuarios.buscar(ref); //casteo para que sea HandleABB y pueda usar métodos que difinimos como posicionEnHeap
+        referidor.valor().acumularMillas(500);
+        ranking.siftUp(referidor.posicionEnHeap()); //después de sumarle las millas acomodo
+        if(referidor.valor().totales() > masAcumulador.totales()){
+            masAcumulador = referidor.valor();
         }
     }
 
     public void acumularMillas(int id, double distancia, String nombrePromo) {        
-        Usuario us = usuarios.usuario(id);
+        ABB<Usuario>.HandleABB us = (ABB<Usuario>.HandleABB) usuarios.buscar(id); //de nuevo, casteo a HandleABB porque esa es la clase que me permite saber su posición en el heap
         Promocion promocion = promociones.promocion(nombrePromo);
-        double categoria = us.categoria();
+        double categoria = us.valor().categoria();
         double factor = promocion.factor();
         double millas = distancia * categoria * factor;
-        us.acumularMillas(millas);
-        /*Hay qe chequear que el heap siga cumpliendo su abstraccion */
+        us.valor().acumularMillas(millas);
+        ranking.siftUp(us.posicionEnHeap());
         if(promocion.tieneTope()){
             promocion.restarTope(distancia);
             if(promocion.tope() == 0){
                 promociones.eliminar(nombrePromo);
             }
         }
-        if(us.totales() > masAcumulador.totales()){
-            masAcumulador = us;
+        if(us.valor().totales() > masAcumulador.totales()){
+            masAcumulador = us.valor();
         }
     }
 
     public void canjearMillas(int id, double cantidad) {
-        Usuario us = usuarios.usuario(id);
+        ABB<Usuario>.HandleABB us = (ABB<Usuario>.HandleABB) usuarios.buscar(id);
         us.canjearMillas(cantidad);
-        /*Hay qe chequear que el heap siga cumpliendo su abstraccion */        
-        if(us.canjeadas() > masCanjeador.canjeadas()){
-            masCanjeador = us;
+        ranking.siftDown(us.posicionEnHeap);        
+        if(us.valor().canjeadas() > masCanjeador.canjeadas()){
+            masCanjeador = us.valor();
         }
     }
 
@@ -77,13 +87,13 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public double consultarSaldo(int id) {
-        Usuario us = usuarios.usuario(id);
-        return us.disponibles();
+        ABB<Usuario>.HandleABB us = (ABB<Usuario>.HandleABB) usuarios.buscar(id);
+        return us.valor().disponibles();
     }
 
     public String consultarCategoria(int id) {
-        Usuario us = usuarios.usuario(id);
-        return us.categoriaStrg();
+        ABB<Usuario>.HandleABB us = (ABB<Usuario>.HandleABB) usuarios.buscar(id);
+        return us.valor().categoriaStrg();
     }
 
     public int[] rankingMillas(int n) {
