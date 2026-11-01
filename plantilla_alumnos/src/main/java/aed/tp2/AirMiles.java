@@ -90,12 +90,12 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public double consultarSaldo(int id) {
-        ABB<Usuario>.HandleABB us = (ABB<Usuario>.HandleABB) usuarios.buscar(id);
+        Handle<Usuario> us = usuarios.buscar(id);
         return us.valor().disponibles();
     }
 
     public String consultarCategoria(int id) {
-        ABB<Usuario>.HandleABB us = (ABB<Usuario>.HandleABB) usuarios.buscar(id);
+        Handle<Usuario> us = usuarios.buscar(id);
         return us.valor().categoriaStrg();
     }
 
