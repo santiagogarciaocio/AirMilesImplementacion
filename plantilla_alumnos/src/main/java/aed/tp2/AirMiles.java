@@ -75,18 +75,15 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public void transferirMillas(int origen, int destino, double cantidad) {
-        Usuario transferidor = usuarios.usuario(origen);
-        Usuario receptor = usuarios.usuario(destino);
-        transferidor.transferencia(receptor, cantidad);
-        /*Aca hay que chequear que si el transferidor era el masACumulador, y por haber canjeado dejo de serlo. El masAcumulador tiene que ser actualizarse */
-        if(transferidor.ID() == masCanjeador.ID()){
-        }else{}
-        if(transferidor.canjeadas() > masCanjeador.canjeadas()){
-            masCanjeador = transferidor;
+        Handle<Usuario> transferidor = usuarios.buscar(origen);
+        Handle<Usuario> receptor = usuarios.buscar(destino);
+        transferidor.valor().transferencia(receptor.valor(), cantidad);
+        if(transferidor.valor().ID() == masCanjeador.ID()){
         }
-        if(receptor.totales() > masAcumulador.totales()){
-            masAcumulador = receptor;
-        }        
+        else{
+        if(transferidor.valor().canjeadas() > masCanjeador.canjeadas()){
+            masCanjeador = transferidor.valor();
+        }}        
     }
 
     public double consultarSaldo(int id) {
