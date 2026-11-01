@@ -19,27 +19,30 @@ public class AirMiles implements SistemaAirMiles {
 
     public void registrarUsuario(int id) {
         Usuario nuevoUsuario = new Usuario(id);
-        int posHeap = ranking.tamaño(); //primero lo meto al final
+        int posHeap = ranking.tamaño();
+        nuevoUsuario.setIndiceHeap(posHeap);
         if (usuarios.cardinal() == 0) {
             masAcumulador = nuevoUsuario;
             masCanjeador = nuevoUsuario;
         }
-        Handle<Usuario> handleNuevoUsuario = usuarios.insertar(id, nuevoUsuario, posHeap);
-        ranking.agregarAlFinal(handleNuevoUsuario);
-        ranking.siftUp(posHeap); //acá lo acomodo
+        Handle<Usuario> handleNuevoUsuario = ranking.agregar(nuevoUsuario);
+        ranking.siftUp(posHeap);
+        usuarios.insertar(id, handleNuevoUsuario);
     }
 
     public void registrarUsuarioConReferidor(int id, int ref) {
+        Usuario referido = new Usuario(id);
         int posHeap = ranking.tamaño();
-        Handle<Usuario> nuevoUsuario = usuarios.insertar(id, new Usuario(id,true), posHeap);
-        ranking.agregarAlFinal(nuevoUsuario);
-        ranking.siftUp(posHeap);
-        
-        ABB<Usuario>.HandleABB referidor = (ABB<Usuario>.HandleABB) usuarios.buscar(ref); //casteo para que sea HandleABB y pueda usar métodos que difinimos como posicionEnHeap
-        referidor.valor().acumularMillas(500);
-        ranking.siftUp(referidor.posicionEnHeap()); //después de sumarle las millas acomodo
-        if(referidor.valor().totales() > masAcumulador.totales()){
-            masAcumulador = referidor.valor();
+        referido.setIndiceHeap(posHeap);
+        Handle<Usuario> handleReferido = ranking.agregar(referido);
+        ranking.siftUp(handleReferido.valor().indiceHeap());
+
+        Handle<Usuario> handleReferidor = usuarios.buscar(ref);
+        handleReferidor.valor().acumularMillas(500);
+        int posReferidor = handleReferidor.valor().indiceHeap();
+        ranking.siftUp(posReferidor);
+        if(handleReferidor.valor().totales() > masAcumulador.totales()){
+            masAcumulador = handleReferidor.valor();
         }
     }
 
