@@ -25,7 +25,7 @@ public class AirMiles implements SistemaAirMiles {
             masAcumulador = nuevoUsuario;
             masCanjeador = nuevoUsuario;
         }
-        Handle<Usuario> handleNuevoUsuario = ranking.agregar(nuevoUsuario);
+        Handle<Usuario> handleNuevoUsuario = ranking.agregarAlFinal(nuevoUsuario);
         siftUp(posHeap);
         usuarios.insertar(id, handleNuevoUsuario);
     }
@@ -34,7 +34,7 @@ public class AirMiles implements SistemaAirMiles {
         Usuario referido = new Usuario(id, true);
         int posHeap = ranking.tamaño();
         referido.setIndiceHeap(posHeap);
-        Handle<Usuario> handleReferido = ranking.agregar(referido);
+        Handle<Usuario> handleReferido = ranking.agregarAlFinal(referido);
         siftUp(handleReferido.valor().indiceHeap());
         usuarios.insertar(id, handleReferido);
 
@@ -109,14 +109,20 @@ public class AirMiles implements SistemaAirMiles {
         }
         int puntero = 0;
         while(puntero < res.length){
-            Usuario us = ranking.sacarMáximo();
+            Usuario us = ranking.desencolar();
+            if (ranking.tamaño() > 0){
+            ranking.getData(0).setIndiceHeap(0);
+            siftDown(0);
+            }
             res[puntero] = us.ID();
             almacenamientoTemporal[puntero] = us;
             puntero ++;
         }
         puntero = 0;
         while(puntero < res.length){
-            ranking.agregar(almacenamientoTemporal[puntero]);
+            ranking.agregarAlFinal(almacenamientoTemporal[puntero]);
+            almacenamientoTemporal[puntero].setIndiceHeap(ranking.tamaño() - 1);
+            siftUp(ranking.tamaño() - 1);
             puntero ++;
         }
         return res;
@@ -162,10 +168,10 @@ public class AirMiles implements SistemaAirMiles {
     private void intercambiar(int i, int j) {
         Usuario g = ranking.getData(j);
         Usuario h = ranking.getData(i);
+        g.setIndiceHeap(i);
+        h.setIndiceHeap(j);
         ranking.setearData(i, g);
         ranking.setearData(j, h);
-        g.setIndiceHeap(i);
-        h.setIndiceHeap(j); 
     }
 
     public void siftUp(int i) {
@@ -173,6 +179,7 @@ public class AirMiles implements SistemaAirMiles {
             int padre = (i - 1)/ 2;
             if (ranking.getData(i).compareTo(ranking.getData(padre)) > 0) {
                 intercambiar(i, padre);
+                i = padre;
             }
             else return; 
         }
