@@ -72,6 +72,14 @@ class Heap<T extends Comparable<T>> {
         return new HandleHeap(u);
     }
 
+    public T desencolar(){
+        _tamaño -= 1;
+        T maximo = _data.get(0);
+        _data.set(0, _data.getLast());
+        _data.removeLast();
+        return maximo;
+    }
+
     public T getData(int i) {
         return _data.get(i);
     }
