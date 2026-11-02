@@ -158,6 +158,10 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public int[][] paresTransferidoresExclusivos() {
+        if (usuarios.cardinal() == 0){
+            int[][] vacio = {};
+            return vacio;
+        }
         int[][] res_aux = new int[usuarios.cardinal()][2];
         int tamaño_res = 0;
         ABB<Usuario>.ABB_Iterador iterador = usuarios.new ABB_Iterador();
