@@ -31,7 +31,7 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public void registrarUsuarioConReferidor(int id, int ref) {
-        Usuario referido = new Usuario(id);
+        Usuario referido = new Usuario(id, true);
         int posHeap = ranking.tamaño();
         referido.setIndiceHeap(posHeap);
         Handle<Usuario> handleReferido = ranking.agregar(referido);
