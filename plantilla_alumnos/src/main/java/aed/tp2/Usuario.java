@@ -5,10 +5,8 @@ class Usuario implements Comparable<Usuario> {
     private double Totales;
     private double Disponibles;
     private double Canjeadas;
-    private Usuario ultimoUsuarioTransferido;
-    private boolean esTransferidorExlusivo;
-    private Usuario ultimoUsuarioRecibido;
-    private boolean esReceptorExlusivo;
+    private boolean esParExclusivo;
+    private Usuario ultimoTransferidor;
     private int indiceHeap;
     /* guardar la informacion completa de enviadas y recibidas/ de si es trasnferidos y receptor exlusivao
     Entonces cuando estamos recorriendo el ABB para 'paresTransferidoresExlusivos' y vemos que efectivamente es trasnfereridor exclusivo. 
@@ -25,10 +23,7 @@ class Usuario implements Comparable<Usuario> {
         Totales = 0;
         Disponibles = 0;      
         Canjeadas = 0;
-        ultimoUsuarioTransferido = this; /*pongo placeholder el id del propio porque intentando poner null me tira error */
-        esTransferidorExlusivo = false;
-        ultimoUsuarioRecibido = this;
-        esReceptorExlusivo = false;
+        esParExclusivo = false;
     }
 
     public Usuario(int id, boolean referido){
@@ -36,10 +31,7 @@ class Usuario implements Comparable<Usuario> {
         Totales = 500;
         Disponibles = 500;      
         Canjeadas = 0;
-        ultimoUsuarioTransferido = this; /*pongo placeholder el id del propio porque intentando poner null me tira error */
-        esTransferidorExlusivo = false;
-        ultimoUsuarioRecibido = this;
-        esReceptorExlusivo = false;
+        esParExclusivo = false;
     }
 
     /*--------------------------------------------------------------------------------------------------------- */
@@ -70,20 +62,12 @@ class Usuario implements Comparable<Usuario> {
         return this.Canjeadas;
     }
 
-    public boolean esTransferidorExlusivo(){
-        return this.esTransferidorExlusivo;
+    public boolean esParExclusivo(){
+        return this.esParExclusivo;
     }
 
-    public int ultimoUsuarioTransferido(){
-        return this.ultimoUsuarioTransferido.ID();
-    }
-
-    public boolean esReceptorExlusivo(){
-        return this.esReceptorExlusivo;
-    }
-
-    public int ultimoUsuarioRecibido(){
-        return this.ultimoUsuarioRecibido.ID();
+    public Usuario ultimoTransferidor(){
+        return this.ultimoTransferidor;
     }
 
     /*--------------------------------------------------------------------------------------------------------- */
@@ -107,62 +91,21 @@ class Usuario implements Comparable<Usuario> {
     /*--------------------------------------------------------------------------------------------------------- */
 
 
-    public void transferencia(Usuario receptor, double millas){        
-        enviarTransferencia(this, receptor, millas);
-        recibirTransferencia(this, receptor, millas);
-    }    
-
-    public void enviarTransferencia(Usuario us_transferidor, Usuario us_receptor, double millas){
-        us_transferidor.canjearMillas(millas);
-        us_transferidor.Totales = us_transferidor.Totales - millas;
-        if(us_transferidor.ultimoUsuarioTransferido() == us_transferidor.ID()){
-            us_transferidor.ultimoUsuarioTransferido = us_receptor;
-            us_transferidor.esTransferidorExlusivo = true;
+    public void transferencia(Usuario us, double millas){
+        Disponibles += millas;
+        if (ultimoTransferidor == null){
+            if (us.ultimoTransferidor() == null || (us.ultimoTransferidor() == this && us.esParExclusivo())){
+                ultimoTransferidor = us;
+                esParExclusivo = true;
+            }
+            else {
+                ultimoTransferidor = us;
+            }
         }
-        else if(us_transferidor.ultimoUsuarioTransferido() != us_receptor.ID()){
-            us_transferidor.esTransferidorExlusivo = false;
-            desvincularParejaExclusiva(us_transferidor.ultimoUsuarioTransferido,us_transferidor.ultimoUsuarioRecibido);
+        else if (esParExclusivo() && (ultimoTransferidor() != us)){
+            esParExclusivo = false;
+            ultimoTransferidor.esParExclusivo = false;            
         }
-    }
-
-    
-    public void recibirTransferencia(Usuario us_transferidor, Usuario us_receptor, double millas){
-        us_receptor.acumularMillas(millas);            
-        if(us_receptor.ultimoUsuarioRecibido() == us_receptor.ID()){
-            us_receptor.ultimoUsuarioRecibido = us_transferidor;
-            us_receptor.esReceptorExlusivo = true;
-        }
-        else if(us_receptor.ultimoUsuarioRecibido() != us_transferidor.ID()){
-            us_receptor.esReceptorExlusivo = false;
-            desvincularParejaExclusiva(us_receptor.ultimoUsuarioTransferido, us_receptor.ultimoUsuarioRecibido);
-        }
-    }    
-
-    public void desvincularParejaExclusiva(Usuario ultimoTransferido, Usuario ultimoRecibido){
-        ultimoTransferido.esReceptorExlusivo = false;
-        ultimoTransferido.esTransferidorExlusivo = false;
-        ultimoRecibido.esReceptorExlusivo = false;
-        ultimoRecibido.esTransferidorExlusivo = false;
-    }
-
-
-    /*--------------------------------------------------------------------------------------------------------- */
-    /*Chequeo pareja Transferidores Exclusivos */
-    /*--------------------------------------------------------------------------------------------------------- */
-
-    public boolean estaEnParejaTransferidoresExclusivos(){
-        return (esTransferidorExlusivo() && esReceptorExlusivo()) && (ultimoUsuarioTransferido() == ultimoUsuarioRecibido());
-    }
-
-    public int parejaTransferidoraExclusiva(){
-        if(estaEnParejaTransferidoresExclusivos()){
-            return ultimoUsuarioTransferido();
-        }
-        else{
-            throw new UnsupportedOperationException("No tiene pareja exclusiva");
-            /*Aca quizas deberiamos poner para que tire un erro */
-        }
-        
     }
 
     /*Consultar categoria */
