@@ -28,6 +28,16 @@ public class TrieTests {
     }
 
     @Test
+    void pertenece() {
+        Trie tr = new Trie();
+
+        tr.agregar("nolimits", 3.15, 100000);
+
+        assertTrue(tr.pertenece("nolimits"));
+        assertFalse(tr.pertenece("nolimit"));
+    }
+
+    @Test
     void eliminarPromo() {
         Trie tr = new Trie();
         tr.agregar("nopromo",1);
@@ -38,6 +48,20 @@ public class TrieTests {
         tr.eliminar("nolimits");
 
         assertFalse(tr.pertenece("nolimits"));
+    }
+
+    @Test
+    void eliminarSinCompartidas() {
+        Trie tr = new Trie();
+        tr.agregar("nopromo",1);
+        tr.agregar("sipromo", 3.15, 100000);
+
+        assertTrue(tr.pertenece("nopromo"));
+        assertTrue(tr.pertenece("sipromo"));        
+
+        tr.eliminar("sipromo");
+
+        assertTrue(tr.pertenece("nopromo"));
 
     }
 
@@ -52,6 +76,19 @@ public class TrieTests {
 
         assertFalse(tr.pertenece("nopromo"));
         assertTrue(tr.pertenece("nopromociones"));
+    }
+
+    @Test
+    void eliminarSufijo() {
+        Trie tr = new Trie();
+        
+        tr.agregar("nopromo",1);
+        tr.agregar("nopromociones",2);
+
+        tr.eliminar("nopromociones");
+
+        assertTrue(tr.pertenece("nopromo"));
+        assertFalse(tr.pertenece("nopromociones"));
     }
 
     @Test

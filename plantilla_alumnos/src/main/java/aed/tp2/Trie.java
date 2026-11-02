@@ -53,7 +53,16 @@ public class Trie {
                 i++;
             }
         }
-        return nodo_actual.promo.estaActiva();
+        /* Antes estaba
+        return nodo_actual.promo.estaActiva(); 
+        pero tiraba error en test pertenece, y eliminarPrefijo 
+        POrque podia acceder a la posicion, dado que hay promociones 'mas abajo en el arbol', pero en la posicion a laque llego notenia promo
+        entonces cuando intenta acceder con .estaActiva() siendo null la promo se rompe*/
+        if(nodo_actual.promo == null){
+            return false;
+        }else{
+            return nodo_actual.promo.estaActiva();
+        }
     }
 
     public void agregar(String promocion, double factor) {
@@ -71,6 +80,7 @@ public class Trie {
                 i++;
             }
         }
+        nodo_actual.cantPromos ++;
         nodo_actual.promo = new Promocion(promocion, factor);
         return;
     }
@@ -90,6 +100,7 @@ public class Trie {
                 i++;
             }
         }
+        nodo_actual.cantPromos ++;
         nodo_actual.promo = new Promocion(promocion, factor, tope);        
         return;
     }
