@@ -187,7 +187,7 @@ class Usuario implements Comparable<Usuario> {
         }else if(this.Totales < 1000000){
             return 2.0;
         }else{
-            return 2.5;
+            return 0;
         }
     }
 
