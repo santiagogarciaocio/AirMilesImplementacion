@@ -49,18 +49,26 @@ public class AirMiles implements SistemaAirMiles {
 
     public void acumularMillas(int id, double distancia, String nombrePromo) {        
         Handle<Usuario> us = usuarios.buscar(id);
+        double factor;
+        if (promociones.pertenece(nombrePromo)) {
         Promocion promocion = promociones.promocion(nombrePromo);
+            factor = promocion.factor();
+        }
+        else {
+            factor = 1;
+        }
         double categoria = us.valor().categoria();
-        double factor = promocion.factor();
         double millas = distancia * categoria * factor;
         us.valor().acumularMillas(millas);
         siftUp(us.valor().indiceHeap());
+        if (promociones.pertenece(nombrePromo)) {
+        Promocion promocion = promociones.promocion(nombrePromo);
         if(promocion.tieneTope()){
-            promocion.restarTope(distancia);
+            promocion.restarTope(millas);
             if(promocion.tope() == 0){
                 promociones.eliminar(nombrePromo);
             }
-        }
+        }}
         if(us.valor().totales() > masAcumulador.totales()){
             masAcumulador = us.valor();
         }
@@ -78,13 +86,14 @@ public class AirMiles implements SistemaAirMiles {
     public void transferirMillas(int origen, int destino, double cantidad) {
         Handle<Usuario> transferidor = usuarios.buscar(origen);
         Handle<Usuario> receptor = usuarios.buscar(destino);
-        transferidor.valor().transferencia(receptor.valor(), cantidad);
-        if(transferidor.valor().ID() == masCanjeador.ID()){
-        }
-        else{
+        receptor.valor().transferencia(transferidor.valor(), cantidad);
+        transferidor.valor().transferencia(receptor.valor(), 0);
+        transferidor.valor().canjearMillas(cantidad);
         if(transferidor.valor().canjeadas() > masCanjeador.canjeadas()){
             masCanjeador = transferidor.valor();
-        }}        
+        }
+        siftDown(transferidor.valor().indiceHeap());
+        siftUp(receptor.valor().indiceHeap());        
     }
 
     public double consultarSaldo(int id) {
@@ -149,18 +158,22 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public int[][] paresTransferidoresExclusivos() {
-        int[][] res = new int[0][2];
-        
-        ABB.ABB_Iterador iterador = usuarios.new ABB_Iterador();
+        int[][] res_aux = new int[usuarios.cardinal()][2];
+        int tamaño_res = 0;
+        ABB<Usuario>.ABB_Iterador iterador = usuarios.new ABB_Iterador();
         while(iterador.haySiguiente()){
             Usuario us = iterador.siguiente();
-            if(us.estaEnParejaTransferidoresExclusivos()){
-                if(us.ID() < us.parejaTransferidoraExclusiva()){
-                    res = new int[res.length+1][2];
-                    res[res.length][0] = us.ID();
-                    res[res.length][0] = us.parejaTransferidoraExclusiva();
-                }
+            if(us.esParExclusivo() && us.ultimoTransferidor().ID() > us.ID()){
+                int[] par = {us.ID(), us.ultimoTransferidor().ID()};
+                res_aux[tamaño_res] = par;
+                tamaño_res ++;
             }
+        }
+        int[][] res = new int[tamaño_res][2];
+        int contador = 0;
+        while (contador < tamaño_res){
+            res[contador] = res_aux[contador];
+            contador ++;
         }             
         return res;        
     }
