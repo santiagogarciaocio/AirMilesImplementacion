@@ -30,20 +30,20 @@ class ABB<T> {
         return _cardinal;
     }
 
-    public Handle<T> minimo(){
+    public int minimo(){
         Nodo actual = _raíz;
         while(! (actual.izq == null)){
             actual = actual.izq;
         }
-        return actual.handle;
+        return actual.ID;
     }
 
-    public Handle<T> maximo(){
+    public int maximo(){
         Nodo actual = _raíz;
         while(! (actual.der == null)){
             actual = actual.der;
         }
-        return actual.handle;        
+        return actual.ID;        
     }
 
     public boolean pertenece(T elem){ // esta creo que no se puede hacer en O(log n) ya que hay que recorrer todos los nodos
@@ -221,8 +221,8 @@ class ABB<T> {
             return _actual.ID != maximo();
         }
     
-        public int siguiente() {            
-            int devolver = _actual.ID;
+        public T siguiente() {            
+            T devolver = _actual.handle.valor();
             if(haySiguiente()){
                 //caso si tiene derecha
                 if(_actual.der != null){
