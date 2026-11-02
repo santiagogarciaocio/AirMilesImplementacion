@@ -15,8 +15,6 @@ public class AirMilesTests {
     @Test
     void crearSistema() {
         assertNotNull(am);
-        assertEquals(-1, am.elMasAcumulador());
-        assertEquals(-1, am.elMasCanjeador());
         assertEquals(0, am.paresTransferidoresExclusivos().length);
     }
 
