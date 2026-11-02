@@ -98,20 +98,28 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public int[] rankingMillas(int n) {
-        int [] res;
+        Usuario[] almacenamientoTemporal;
+        int[] res;
         if(n > ranking.tamaño()){
             res = new int[ranking.tamaño()];
+            almacenamientoTemporal = new Usuario[ranking.tamaño()];
         }else{
             res = new int[n];
+            almacenamientoTemporal = new Usuario[n];
         }
         int puntero = 0;
-        while(puntero < n){
-            Handle<Usuario> us = ranking.sacarMáximo();
-            res[puntero] = us.valor().ID();
+        while(puntero < res.length){
+            Usuario us = ranking.sacarMáximo();
+            res[puntero] = us.ID();
+            almacenamientoTemporal[puntero] = us;
+            puntero ++;
         }
-        /*aca falta volver a agregar los usuarios al heap */
+        puntero = 0;
+        while(puntero < res.length){
+            ranking.agregar(almacenamientoTemporal[puntero]);
+            puntero ++;
+        }
         return res;
-        
     }
 
     public void iniciarPromocion(String nombre, double factor) {
