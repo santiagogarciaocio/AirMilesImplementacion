@@ -22,7 +22,7 @@ public class HeapTests {
         assertEquals(u1, hp.máximo());
         assertEquals(1, hp.tamaño());
 
-        hp.sacarMáximo();
+        hp.desencolar();
         assertEquals(0, hp.tamaño());
     }
 
@@ -61,25 +61,25 @@ public class HeapTests {
 
         assertEquals(7, hp.tamaño());
 
-        assertEquals(u7, hp.sacarMáximo());
+        assertEquals(u7, hp.desencolar());
         assertEquals(6, hp.tamaño());
 
-        assertEquals(u6, hp.sacarMáximo());
+        assertEquals(u6, hp.desencolar());
         assertEquals(5, hp.tamaño());
 
-        assertEquals(u1, hp.sacarMáximo());
+        assertEquals(u1, hp.desencolar());
         assertEquals(4, hp.tamaño());
 
-        assertEquals(u5, hp.sacarMáximo());
+        assertEquals(u5, hp.desencolar());
         assertEquals(3, hp.tamaño());
 
-        assertEquals(u3, hp.sacarMáximo());
+        assertEquals(u3, hp.desencolar());
         assertEquals(2, hp.tamaño());
 
-        assertEquals(u4, hp.sacarMáximo());
+        assertEquals(u4, hp.desencolar());
         assertEquals(1, hp.tamaño());
         
-        assertEquals(u2, hp.sacarMáximo());
+        assertEquals(u2, hp.desencolar());
         assertEquals(0, hp.tamaño());
 
     }
