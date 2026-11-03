@@ -25,8 +25,7 @@ public class AirMiles implements SistemaAirMiles {
             masAcumulador = nuevoUsuario;
             masCanjeador = nuevoUsuario;
         }
-        Handle<Usuario> handleNuevoUsuario = ranking.agregarAlFinal(nuevoUsuario);
-        siftUp(posHeap);
+        Handle<Usuario> handleNuevoUsuario = ranking.agregar(nuevoUsuario);
         usuarios.insertar(id, handleNuevoUsuario);
     }
 
@@ -34,14 +33,13 @@ public class AirMiles implements SistemaAirMiles {
         Usuario referido = new Usuario(id, true);
         int posHeap = ranking.tamaño();
         referido.setIndiceHeap(posHeap);
-        Handle<Usuario> handleReferido = ranking.agregarAlFinal(referido);
-        siftUp(handleReferido.valor().indiceHeap());
+        Handle<Usuario> handleReferido = ranking.agregar(referido);
         usuarios.insertar(id, handleReferido);
 
         Handle<Usuario> handleReferidor = usuarios.buscar(ref);
         handleReferidor.valor().acumularMillas(500);
         int posReferidor = handleReferidor.valor().indiceHeap();
-        siftUp(posReferidor);
+        ranking.siftUp(posReferidor);
         if(handleReferidor.valor().totales() > masAcumulador.totales()){
             masAcumulador = handleReferidor.valor();
         }
@@ -60,7 +58,7 @@ public class AirMiles implements SistemaAirMiles {
         double categoria = us.valor().categoria();
         double millas = distancia * categoria * factor;
         us.valor().acumularMillas(millas);
-        siftUp(us.valor().indiceHeap());
+        ranking.siftUp(us.valor().indiceHeap());
         if (promociones.pertenece(nombrePromo)) {
         Promocion promocion = promociones.promocion(nombrePromo);
         if(promocion.tieneTope()){
@@ -77,7 +75,7 @@ public class AirMiles implements SistemaAirMiles {
     public void canjearMillas(int id, double cantidad) {
         Handle<Usuario> us = usuarios.buscar(id);
         us.valor().canjearMillas(cantidad);
-        siftDown(us.valor().indiceHeap());       
+        ranking.siftDown(us.valor().indiceHeap());       
         if(us.valor().canjeadas() > masCanjeador.canjeadas()){
             masCanjeador = us.valor();
         }
@@ -92,8 +90,8 @@ public class AirMiles implements SistemaAirMiles {
         if(transferidor.valor().canjeadas() > masCanjeador.canjeadas()){
             masCanjeador = transferidor.valor();
         }
-        siftDown(transferidor.valor().indiceHeap());
-        siftUp(receptor.valor().indiceHeap());        
+        ranking.siftDown(transferidor.valor().indiceHeap());
+        ranking.siftUp(receptor.valor().indiceHeap());        
     }
 
     public double consultarSaldo(int id) {
@@ -119,19 +117,14 @@ public class AirMiles implements SistemaAirMiles {
         int puntero = 0;
         while(puntero < res.length){
             Usuario us = ranking.desencolar();
-            if (ranking.tamaño() > 0){
-            ranking.getData(0).setIndiceHeap(0);
-            siftDown(0);
-            }
             res[puntero] = us.ID();
             almacenamientoTemporal[puntero] = us;
             puntero ++;
         }
         puntero = 0;
         while(puntero < res.length){
-            ranking.agregarAlFinal(almacenamientoTemporal[puntero]);
-            almacenamientoTemporal[puntero].setIndiceHeap(ranking.tamaño() - 1);
-            siftUp(ranking.tamaño() - 1);
+            almacenamientoTemporal[puntero].setIndiceHeap(ranking.tamaño());
+            ranking.agregar(almacenamientoTemporal[puntero]);
             puntero ++;
         }
         return res;
@@ -181,44 +174,4 @@ public class AirMiles implements SistemaAirMiles {
         }             
         return res;        
     }
-
-    private void intercambiar(int i, int j) {
-        Usuario g = ranking.getData(j);
-        Usuario h = ranking.getData(i);
-        g.setIndiceHeap(i);
-        h.setIndiceHeap(j);
-        ranking.setearData(i, g);
-        ranking.setearData(j, h);
-    }
-
-    public void siftUp(int i) {
-        while (i > 0) {
-            int padre = (i - 1)/ 2;
-            if (ranking.getData(i).compareTo(ranking.getData(padre)) > 0) {
-                intercambiar(i, padre);
-                i = padre;
-            }
-            else return; 
-        }
-    }
-
-    public void siftDown(int i) {
-        while ((i * 2) + 1 < ranking.tamaño()) {
-            int izq = (i * 2) + 1;
-            int der = (i * 2) + 2;
-            int hijoMayor;
-            if (der < ranking.tamaño() && ranking.getData(der).compareTo(ranking.getData(izq)) > 0) {
-                hijoMayor = der;
-            }
-            else {
-                hijoMayor = izq;
-            }
-            if (ranking.getData(i).compareTo(ranking.getData(hijoMayor)) < 0) {
-                intercambiar(i, hijoMayor);
-                i = hijoMayor;
-            }
-            else {
-                return; 
-            }
-        }}
 }
