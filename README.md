@@ -10,6 +10,8 @@ Dudas:
   - ABB
   - el metodo eliminar no lo usamos, lo podemos borrar?
 
+
   - General
   - Que onda al final con los == null?
+  - Hay que eliminar VectorTests
   
