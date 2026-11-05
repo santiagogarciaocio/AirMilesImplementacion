@@ -19,8 +19,7 @@ public class AirMiles implements SistemaAirMiles {
 
     public void registrarUsuario(int id) {
         Usuario nuevoUsuario = new Usuario(id);
-        int posHeap = ranking.tamaño();
-        nuevoUsuario.setIndiceHeap(posHeap);
+        nuevoUsuario.setOrdenDeLlegada(ranking.orden());
         if (usuarios.cardinal() == 0) {
             masAcumulador = nuevoUsuario;
             masCanjeador = nuevoUsuario;
@@ -31,14 +30,13 @@ public class AirMiles implements SistemaAirMiles {
 
     public void registrarUsuarioConReferidor(int id, int ref) {
         Usuario referido = new Usuario(id, true);
-        int posHeap = ranking.tamaño();
-        referido.setIndiceHeap(posHeap);
+        referido.setOrdenDeLlegada(ranking.orden());
         Handle<Usuario> handleReferido = ranking.agregar(referido);
         usuarios.insertar(id, handleReferido);
 
         Handle<Usuario> handleReferidor = usuarios.buscar(ref);
         handleReferidor.valor().acumularMillas(500);
-        int posReferidor = handleReferidor.valor().indiceHeap();
+        int posReferidor = handleReferidor.valor().ordenDeLlegada();
         ranking.siftUp(posReferidor);
         if(handleReferidor.valor().totales() > masAcumulador.totales()){
             masAcumulador = handleReferidor.valor();
@@ -58,7 +56,7 @@ public class AirMiles implements SistemaAirMiles {
         double categoria = us.valor().categoria();
         double millas = distancia * categoria * factor;
         us.valor().acumularMillas(millas);
-        ranking.siftUp(us.valor().indiceHeap());
+        ranking.siftUp(us.valor().ordenDeLlegada());
         if (promociones.pertenece(nombrePromo)) {
         Promocion promocion = promociones.promocion(nombrePromo);
         if(promocion.tieneTope()){
@@ -75,7 +73,7 @@ public class AirMiles implements SistemaAirMiles {
     public void canjearMillas(int id, double cantidad) {
         Handle<Usuario> us = usuarios.buscar(id);
         us.valor().canjearMillas(cantidad);
-        ranking.siftDown(us.valor().indiceHeap());       
+        ranking.siftDown(us.valor().ordenDeLlegada());       
         if(us.valor().canjeadas() > masCanjeador.canjeadas()){
             masCanjeador = us.valor();
         }
@@ -84,14 +82,12 @@ public class AirMiles implements SistemaAirMiles {
     public void transferirMillas(int origen, int destino, double cantidad) {
         Handle<Usuario> transferidor = usuarios.buscar(origen);
         Handle<Usuario> receptor = usuarios.buscar(destino);
-        receptor.valor().transferencia(transferidor.valor(), cantidad);
-        transferidor.valor().transferencia(receptor.valor(), 0);
-        transferidor.valor().canjearMillas(cantidad);
+        receptor.valor().recibirTransferencia(transferidor.valor(), cantidad);
         if(transferidor.valor().canjeadas() > masCanjeador.canjeadas()){
             masCanjeador = transferidor.valor();
         }
-        ranking.siftDown(transferidor.valor().indiceHeap());
-        ranking.siftUp(receptor.valor().indiceHeap());        
+        ranking.siftDown(transferidor.valor().ordenDeLlegada());
+        ranking.siftUp(receptor.valor().ordenDeLlegada());           
     }
 
     public double consultarSaldo(int id) {
@@ -123,7 +119,7 @@ public class AirMiles implements SistemaAirMiles {
         }
         puntero = 0;
         while(puntero < res.length){
-            almacenamientoTemporal[puntero].setIndiceHeap(ranking.tamaño());
+            almacenamientoTemporal[puntero].setOrdenDeLlegada(ranking.orden());
             ranking.agregar(almacenamientoTemporal[puntero]);
             puntero ++;
         }
