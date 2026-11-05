@@ -4,15 +4,25 @@ import java.util.ArrayList;
 
 class Heap<T extends Comparable<T>> {
     private ArrayList<T> _data;
+    private ArrayList<Integer> _posicionesDeOrdenaHeap; //sus índices son el orden de ingreso al sistema y los valores la pos en el heap
+    private ArrayList<Integer> _posicionesDeHeapaOrden; //sus índices son la pos en el heap y los valores el orden de ingreso al sistema
     private int _tamaño;
+    private int _orden;
 
     public Heap() {
         _data = new ArrayList<T>();
+        _posicionesDeOrdenaHeap = new ArrayList<Integer>();
+        _posicionesDeHeapaOrden = new ArrayList<Integer>();
         _tamaño = 0;
+        _orden = 0;
     }
 
     public int tamaño() {
         return _tamaño;
+    }
+
+    public int orden() {
+        return _orden;
     }
 
     public T máximo () {
@@ -23,7 +33,10 @@ class Heap<T extends Comparable<T>> {
     public Handle<T> agregar(T u) {
         _tamaño += 1;
         _data.add(u);
-        siftUp(_tamaño - 1);
+        _posicionesDeOrdenaHeap.add(_tamaño - 1);
+        _posicionesDeHeapaOrden.add(_tamaño - 1, _orden);
+        siftUp(_orden);
+        _orden ++;
         return new HandleHeap(u);
     }
 
@@ -32,7 +45,7 @@ class Heap<T extends Comparable<T>> {
         T maximo = _data.get(0);
         intercambiar(0, _tamaño);
         _data.removeLast();
-        siftDown(0);
+        siftDown(_posicionesDeHeapaOrden.get(0));
         return maximo;
     }
 
@@ -41,13 +54,19 @@ class Heap<T extends Comparable<T>> {
         T elem_2 = _data.get(j);
         _data.set(i, elem_2);
         _data.set(j, elem_1);
-        if (_data.get(i) instanceof Usuario){
-            ((Usuario) _data.get(i)).setIndiceHeap(i);
-            ((Usuario) _data.get(j)).setIndiceHeap(j);
-        }
+
+        int id_i = _posicionesDeHeapaOrden.get(i);
+        int id_j = _posicionesDeHeapaOrden.get(j);
+
+        _posicionesDeHeapaOrden.set(i, id_j);
+        _posicionesDeHeapaOrden.set(j, id_i);
+
+        _posicionesDeOrdenaHeap.set(id_i, j);
+        _posicionesDeOrdenaHeap.set(id_j, i);
     }
 
-    public void siftUp(int i) {
+    public void siftUp(int j) {
+        int i = _posicionesDeOrdenaHeap.get(j);
         while (i > 0) {
             int padre = (i - 1)/ 2;
             if (_data.get(i).compareTo(_data.get(padre)) > 0) {
@@ -58,7 +77,8 @@ class Heap<T extends Comparable<T>> {
         }
     }
 
-    public void siftDown(int i) {
+    public void siftDown(int j) {
+        int i = _posicionesDeOrdenaHeap.get(j);
         while ((i * 2) + 1 < tamaño()) {
             int izq = (i * 2) + 1;
             int der = (i * 2) + 2;
