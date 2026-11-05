@@ -7,7 +7,7 @@ class Usuario implements Comparable<Usuario> {
     private double Canjeadas;
     private boolean esParExclusivo;
     private Usuario ultimoTransferidor;
-    private int indiceHeap;
+    private int ordenDeLlegada;
     /* guardar la informacion completa de enviadas y recibidas/ de si es trasnferidos y receptor exlusivao
     Entonces cuando estamos recorriendo el ABB para 'paresTransferidoresExlusivos' y vemos que efectivamente es trasnfereridor exclusivo. 
     si es menor a su pareja lo ponemos en la lista
@@ -42,12 +42,12 @@ class Usuario implements Comparable<Usuario> {
         return this.ID;
     }
 
-    public int indiceHeap(){
-        return indiceHeap;
+    public int ordenDeLlegada(){
+        return ordenDeLlegada;
     }
 
-    public void setIndiceHeap(int i){
-        indiceHeap = i;
+    public void setOrdenDeLlegada(int i){
+        ordenDeLlegada = i;
     }
     
     public double totales(){
@@ -91,21 +91,26 @@ class Usuario implements Comparable<Usuario> {
     /*--------------------------------------------------------------------------------------------------------- */
 
 
-    public void transferencia(Usuario us, double millas){
+    public void recibirTransferencia(Usuario dador, double millas){
         Disponibles += millas;
-        if (ultimoTransferidor == null){
-            if (us.ultimoTransferidor() == null || (us.ultimoTransferidor() == this && us.esParExclusivo())){
-                ultimoTransferidor = us;
-                esParExclusivo = true;
+        dador.Disponibles -= millas;
+        dador.Canjeadas += millas;
+        if (ultimoTransferidor == null && dador.ultimoTransferidor == null){
+            esParExclusivo = true;
+            dador.esParExclusivo = true;
+        }
+        else {
+            if (ultimoTransferidor != dador && this.esParExclusivo()) {
+                esParExclusivo = false;
+                ultimoTransferidor.esParExclusivo = false;
             }
-            else {
-                ultimoTransferidor = us;
+            if (dador.ultimoTransferidor != this && dador.esParExclusivo()) {
+                dador.esParExclusivo = false;
+                dador.ultimoTransferidor.esParExclusivo = false;
             }
         }
-        else if (esParExclusivo() && (ultimoTransferidor() != us)){
-            esParExclusivo = false;
-            ultimoTransferidor.esParExclusivo = false;            
-        }
+        ultimoTransferidor = dador;
+        dador.ultimoTransferidor = this;
     }
 
     /*Consultar categoria */
