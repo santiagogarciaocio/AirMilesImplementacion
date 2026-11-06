@@ -1,9 +1,7 @@
 package aed.tp2;
 
-import aed.tp2.ABB.ABB_Iterador;
 
 public class AirMiles implements SistemaAirMiles {
-    /*COMPLETAR*/
     private Trie promociones;
     private ABB<Usuario> usuarios;
     private Heap<Usuario> ranking;
@@ -44,7 +42,7 @@ public class AirMiles implements SistemaAirMiles {
     }
 
     public void acumularMillas(int id, double distancia, String nombrePromo) {        
-        Handle<Usuario> us = usuarios.buscar(id);
+        Usuario us = usuarios.buscar(id).valor();
         double factor;
         if (promociones.pertenece(nombrePromo)) {
         Promocion promocion = promociones.promocion(nombrePromo);
@@ -53,10 +51,10 @@ public class AirMiles implements SistemaAirMiles {
         else {
             factor = 1;
         }
-        double categoria = us.valor().categoria();
+        double categoria = us.categoria();
         double millas = distancia * categoria * factor;
-        us.valor().acumularMillas(millas);
-        ranking.siftUp(us.valor().ordenDeLlegada());
+        us.acumularMillas(millas);
+        ranking.siftUp(us.ordenDeLlegada());
         if (promociones.pertenece(nombrePromo)) {
         Promocion promocion = promociones.promocion(nombrePromo);
         if(promocion.tieneTope()){
@@ -65,29 +63,29 @@ public class AirMiles implements SistemaAirMiles {
                 promociones.eliminar(nombrePromo);
             }
         }}
-        if(us.valor().totales() > masAcumulador.totales()){
-            masAcumulador = us.valor();
+        if(us.totales() > masAcumulador.totales()){
+            masAcumulador = us;
         }
     }
 
     public void canjearMillas(int id, double cantidad) {
-        Handle<Usuario> us = usuarios.buscar(id);
-        us.valor().canjearMillas(cantidad);
-        ranking.siftDown(us.valor().ordenDeLlegada());       
-        if(us.valor().canjeadas() > masCanjeador.canjeadas()){
-            masCanjeador = us.valor();
+        Usuario us = usuarios.buscar(id).valor();
+        us.canjearMillas(cantidad);
+        ranking.siftDown(us.ordenDeLlegada());       
+        if(us.canjeadas() > masCanjeador.canjeadas()){
+            masCanjeador = us;
         }
     }
 
     public void transferirMillas(int origen, int destino, double cantidad) {
-        Handle<Usuario> transferidor = usuarios.buscar(origen);
-        Handle<Usuario> receptor = usuarios.buscar(destino);
-        receptor.valor().recibirTransferencia(transferidor.valor(), cantidad);
-        if(transferidor.valor().canjeadas() > masCanjeador.canjeadas()){
-            masCanjeador = transferidor.valor();
+        Usuario transferidor = usuarios.buscar(origen).valor();
+        Usuario receptor = usuarios.buscar(destino).valor();
+        receptor.recibirTransferencia(transferidor, cantidad);
+        if(transferidor.canjeadas() > masCanjeador.canjeadas()){
+            masCanjeador = transferidor;
         }
-        ranking.siftDown(transferidor.valor().ordenDeLlegada());
-        ranking.siftUp(receptor.valor().ordenDeLlegada());           
+        ranking.siftDown(transferidor.ordenDeLlegada());
+        ranking.siftUp(receptor.ordenDeLlegada());           
     }
 
     public double consultarSaldo(int id) {
