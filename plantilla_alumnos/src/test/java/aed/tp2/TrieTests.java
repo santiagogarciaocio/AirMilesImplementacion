@@ -9,7 +9,7 @@ public class TrieTests {
 
     @Test
     void crearTrie() {
-        Trie tr = new Trie();
+        Trie<Promocion> tr = new Trie<>();
 
         
         tr.agregar("nopromo",1);
@@ -19,7 +19,7 @@ public class TrieTests {
 
     @Test
     void crearPromoConTope() {
-        Trie tr = new Trie();
+        Trie<Promocion> tr = new Trie();
 
         tr.agregar("nolimits", 3.15, 100000);
 
@@ -29,7 +29,7 @@ public class TrieTests {
 
     @Test
     void pertenece() {
-        Trie tr = new Trie();
+        Trie<Promocion> tr = new Trie();
 
         tr.agregar("nolimits", 3.15, 100000);
 
@@ -39,7 +39,7 @@ public class TrieTests {
 
     @Test
     void eliminarPromo() {
-        Trie tr = new Trie();
+        Trie<Promocion> tr = new Trie();
         tr.agregar("nopromo",1);
         tr.agregar("nolimits", 3.15, 100000);
 
@@ -52,7 +52,7 @@ public class TrieTests {
 
     @Test
     void eliminarSinCompartidas() {
-        Trie tr = new Trie();
+        Trie<Promocion> tr = new Trie();
         tr.agregar("nopromo",1);
         tr.agregar("sipromo", 3.15, 100000);
 
@@ -67,7 +67,7 @@ public class TrieTests {
 
     @Test
     void eliminarPrefijo() {
-        Trie tr = new Trie();
+        Trie<Promocion> tr = new Trie();
         
         tr.agregar("nopromo",1);
         tr.agregar("nopromociones",2);
@@ -80,7 +80,7 @@ public class TrieTests {
 
     @Test
     void eliminarSufijo() {
-        Trie tr = new Trie();
+        Trie<Promocion> tr = new Trie();
         
         tr.agregar("nopromo",1);
         tr.agregar("nopromociones",2);
@@ -93,7 +93,7 @@ public class TrieTests {
 
     @Test
     void modificarPromo() {
-        Trie tr = new Trie();
+        Trie<Promocion> tr = new Trie();
 
         tr.agregar("nolimits", 3.15, 100000);
         
