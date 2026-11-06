@@ -1,22 +1,18 @@
 package aed.tp2;
 
-public class Trie {
 
-    private Nodo raiz;
+public class Trie<T> {
 
-    private class Nodo {
-        private Nodo[] letras;
-        private Promocion promo;
-        private int cantPromos;
+    private Nodo<T> raiz;
+
+    private class Nodo<T> {
+        private Nodo<T>[] letras;
+        private T elem;
+        private int cantHijos;
 
         public Nodo() {
-            letras = new Nodo[256];
-            cantPromos = 0;
-        }
-
-        public Nodo(Promocion promocion) {
-            letras = new Nodo[256];
-            promo = promocion;
+            letras = (Nodo<T>[]) new Nodo[256];
+            cantHijos = 0;
         }
 
         public int indice(char c) {
@@ -27,120 +23,96 @@ public class Trie {
             return letras[indice(c)] != null;
         }
 
-        public Nodo Siguiente(char c) {
+        public Nodo<T> Siguiente(char c) {
             return letras[indice(c)];
         }
 
-        public Nodo agregarNodo(char c) {
-            letras[indice(c)] = new Nodo();
+        public Nodo<T> agregarNodo(char c) {
+            letras[indice(c)] = new Nodo<>();
             return letras[indice(c)];
         }
     }
 
     public Trie() {
-        raiz = new Nodo();
+        raiz = new Nodo<>();
     }
 
-    public boolean pertenece(String promocion) {
+    public boolean pertenece(String nombreElemento) {
         int i = 0;
-        Nodo nodo_actual = raiz;
-        while (i < promocion.length()) {
-            if (!nodo_actual.haySiguiente(promocion.charAt(i))) {
+        Nodo<T> nodo_actual = raiz;
+        while (i < nombreElemento.length()) {
+            if (!nodo_actual.haySiguiente(nombreElemento.charAt(i))) {
                 return false;
             }
             else {
-                nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));
+                nodo_actual = nodo_actual.Siguiente(nombreElemento.charAt(i));
                 i++;
             }
         }
-        /* Antes estaba
-        return nodo_actual.promo.estaActiva(); 
-        pero tiraba error en test pertenece, y eliminarPrefijo 
-        POrque podia acceder a la posicion, dado que hay promociones 'mas abajo en el arbol', pero en la posicion a laque llego notenia promo
-        entonces cuando intenta acceder con .estaActiva() siendo null la promo se rompe*/
-        if(nodo_actual.promo == null){
+        if(nodo_actual.elem == null){
             return false;
         }else{
-            return nodo_actual.promo.estaActiva();
+            return true;
         }
     }
 
-    public void agregar(String promocion, double factor) {
+    public void agregar(String nombreElemento, T elemento) {
         int i = 0;
-        Nodo nodo_actual = raiz;
-        while (i < promocion.length()) {
-            if (nodo_actual.haySiguiente(promocion.charAt(i))) {
-                nodo_actual.cantPromos ++;
-                nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));
+        Nodo<T> nodo_actual = raiz;
+        while (i < nombreElemento.length()) {
+            if (nodo_actual.haySiguiente(nombreElemento.charAt(i))) {
+                nodo_actual.cantHijos ++;
+                nodo_actual = nodo_actual.Siguiente(nombreElemento.charAt(i));
                 i++;
             }
             else {
-                nodo_actual.cantPromos ++;
-                nodo_actual = nodo_actual.agregarNodo(promocion.charAt(i));
+                nodo_actual.cantHijos ++;
+                nodo_actual = nodo_actual.agregarNodo(nombreElemento.charAt(i));
                 i++;
             }
         }
-        nodo_actual.cantPromos ++;
-        nodo_actual.promo = new Promocion(promocion, factor);
+        nodo_actual.cantHijos ++;
+        nodo_actual.elem = elemento;
         return;
     }
 
-    public void agregar(String promocion, double factor, double tope) {
-        int i = 0;
-        Nodo nodo_actual = raiz;
-        while (i < promocion.length()) {
-            if (nodo_actual.haySiguiente(promocion.charAt(i))) {
-                nodo_actual.cantPromos ++;
-                nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));
-                i++;
-            }
-            else {
-                nodo_actual.cantPromos ++;
-                nodo_actual = nodo_actual.agregarNodo(promocion.charAt(i));
-                i++;
-            }
-        }
-        nodo_actual.cantPromos ++;
-        nodo_actual.promo = new Promocion(promocion, factor, tope);        
-        return;
-    }
 
-    public void eliminar(String promocion) {
+    public void eliminar(String nombreElemento) {
         int i = 0;
-        Nodo nodo_actual = raiz;
-        while (i < promocion.length()) {
-            nodo_actual.cantPromos --;            
-            nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));
-            if(nodo_actual.cantPromos == 1){
+        Nodo<T> nodo_actual = raiz;
+        while (i < nombreElemento.length()) {
+            nodo_actual.cantHijos --;            
+            nodo_actual = nodo_actual.Siguiente(nombreElemento.charAt(i));
+            if(nodo_actual.cantHijos == 1){
                 break;}
             i++;            
             }
-        if(i == promocion.length()){
-            nodo_actual.promo = null;
+        if(i == nombreElemento.length()){
+            nodo_actual.elem = null;
         }else{
-            podar(promocion, i);
+            podar(nombreElemento, i);
         }
     }
 
-    private void podar(String promocion, int podarEn){
+    private void podar(String nombreElemento, int podarEn){
         int i = 0;
-        Nodo nodo_actual = raiz;
+        Nodo<T> nodo_actual = raiz;
         while (i < podarEn) {
-            nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));            
+            nodo_actual = nodo_actual.Siguiente(nombreElemento.charAt(i));            
             i++;            
             }
-        nodo_actual.letras[promocion.charAt(i)] = null;
+        nodo_actual.letras[nombreElemento.charAt(i)] = null;
     }
 
-    public Promocion promocion(String promocion) {
+    public T nombreElemento(String nombreElemento) {
         int i = 0;
-        Nodo nodo_actual = raiz;
-        while (i < promocion.length()) {
-            nodo_actual = nodo_actual.Siguiente(promocion.charAt(i));
+        Nodo<T> nodo_actual = raiz;
+        while (i < nombreElemento.length()) {
+            nodo_actual = nodo_actual.Siguiente(nombreElemento.charAt(i));
             i++;
             
         }
-        return nodo_actual.promo;
+        return nodo_actual.elem;
     }
 
 }
