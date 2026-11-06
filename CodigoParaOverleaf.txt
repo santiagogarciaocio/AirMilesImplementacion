@@ -1,0 +1,175 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[left=0.5cm,top=3cm,right=2.5cm,bottom=3cm,bindingoffset=0.5cm]{geometry}
+\usepackage{macros/AEDLogica, macros/AEDEspecificacion, macros/AEDTADs}
+\usepackage{caratula}
+
+
+\titulo{Trabajo práctico}
+\subtitulo{Implementación de TAD: Sistema de Fidelización AirMiles}
+
+\fecha{\today}
+
+\materia{Algoritmos y Estructuras de Datos}
+\grupo{Grupo 1} 
+
+\integrante{Garcia Ocio, Santiago}{1210/25}{santiagogarciaocio@gmail.com}
+\integrante{Seda, Manuel} {631/18}{manu.seda@hotmail.com}
+\integrante{García Peruchini, Federico} {638/25}{fede.gp2018@gmail.com}
+\integrante{Pascazzi, Martin}{711/25}{martinpascazzi@gmail.com} 
+
+
+% Declaramos donde van a estar las figuras
+% No es obligatorio, pero suele ser comodo
+\graphicspath{{../static/}}
+
+% Asi pueden escribir nuevos comandos. 
+% Este por ejemplo asegura q los nombres 
+% que figuren con una tipografia diferenciada  
+\newcommand{\Tipo}[1]{\mathsf{#1}} 
+% la sintaxis es \newcommand{\nombreDeLaMacro}[cantidadDeParametros]{Lo que va ser remplazado por el macro} 
+\newcommand{\norm}[1]{\vert #1\vert}
+
+
+
+\begin{document}
+
+\maketitle
+
+\section{Diseño}
+
+El TAD AirMilles fue implementado con el siguiente diseño:
+\begin{itemize}
+    \item MaxHeap de Usuarios.
+\end{itemize}
+Esta estructura es vital para cumplir las complejidades requeridas para la operacion RankingMillas.
+Como trade-off de agregar el Heap surgio el problema: Vincular a los Usuarios con la posicion en el Heap.
+Recordemos que el Heap es O(1) para obtener el maximo, pero para cualquier otro elemento es O(N). \\
+Un primer intento de solucionar este problema consistió en agregar a cada Usuario un atributo con su posicion en el Heap, logrando asi ir a su posicion en O(1).\\
+Sin emargo al momento de hacer shiftUp o shiftDown, operaciones necesarias para manter el invariante de la estructura cada vez que un usuario acunmula o canjea Millas, habria que modificar el indice de todos los usuarios afectados por el shift.\\
+Por lo tanto necesitabamos poder acceder y modificar el indice de los Usuarios en O(1) para cualquier usuario.
+Esto nos llevo a la solucion adoptada finalmente.
+Guardar como atributo del heap dos arrays.\\
+Uno de ellos, posicionesDeOrdenaHeap indica, dado un usuario (reconocido por su orden de ingreso al sistema) devuelve su indice actual en el Heap. Para obtener el orden de los Usuarios, el Heap tiene tambien un atributo orden. Un contador que va creciendo cuando ingresan nuevos usuarios. No podemos usar el atributo tamaño porque cuando realizamos la operacion de desencolar y encolar (para el metodo rankingMillas) los reingresos tendrían todos el mismo indice.\\ 
+El otro posicionesDeHeapaOrden indica, dada una posicion del Heap el usuario que ubica esa posicion.
+
+Esto nos permite dado un usuario, realizar las operaciones de shiftDown/shiftDown en, el peor caso en O(log N)  si el usuario pasa del fin del Heap al Inicio. Y en  cada intercambio de posiciones entre usuario y sus 'padres' las actualizaciones de sus indices se realizan en O(1).
+
+Si no tuviesemos los indices los tendriamos que buscar en el ABB en tiempo O(Log N) para encontrarlo y O(log N) cantidad de busquedas por posibles padres. Finalmente con O(log(N)²) excediendonos de complejidad O(log N) requerida en las operaciones.
+
+\begin{itemize}
+    \item ABB que guarda la informacion de los Usuarios.  
+    \begin{itemize}
+        \item El ABB esta conectado con el Heap via Handle; y ordenado via el ID del Usuario.
+    \end{itemize}
+    \item Trie de Promociones.
+\end{itemize}    
+Implementado en forma de arreglo. En particular tenemos nodos de longitud 256. Cada posicion del nodo representa un caracter. Cuando se ingresa una neuva promocion cada caracter crea nuevos nodos iterativamente Al finalizar el nombre de la promocion el atributo 'Elem' pasa a contener dicha Promocion, que es una clase.  
+
+Para poder eliminar promociones, de forma tal que se eliminan todos los nodos que no llevan a ninguna promocion, utilizamos el atributo cantHijos. Este cuenta la cantidad de palabras que pasan por él. Una vez que dicho atributo nos marca 1, nos esta indicando que a partir de ese momento la unica promocion en ese camino del Trie es la que queremos borrar.
+
+\begin{itemize}
+    \item MasAcumulador.
+    \begin{itemize}
+        \item El usuario que al momento es el que tiene mas millas totales.
+    \end{itemize}
+    \item MasCanjeador.
+    \begin{itemize}
+        \item El usuario que al momento gasto mas millas.
+    \end{itemize}
+\end{itemize}
+
+Promocion y Usuarios son Clases con sus correspondientes atributos y métodos.
+
+\section{Complejidades}
+
+Veamos  que ese diseño nos permite cumplir con todas las complejidades requeridas para cada operacion.
+\begin{itemize}
+    \item crearSistema en O(1) 
+    \begin{itemize}
+        \item Inicializar ABB O(1) 
+        \item Inicializar Heap O(1) 
+        \item Inicializar Trie O(1) 
+        \item         agregarPromocion('NoPromo') O(|"NoPromo"|),  [Ver iniciarPromo]
+        \item Total = O(1)
+    \end{itemize}
+    \item registrarUsuario / registrarUsuarioConReferidor en O(log U) caso promedio y O(U) peor caso
+    \begin{itemize}
+        \item Encolamos Usuario en el Heap O(log U)
+        \item Agregamos el Handle del usuario al ABB; caso promedio O(log U), peor caso O(U)
+        \item Sumarle millas al usuario referidos es O(1) ya que lo que cuesta es encontrarlo
+        \item En el peor caso vamos vamos a tener que actualizar la posicion en el Heap del usuario referidor del piso al tope. Eso tiene costo de O(log U) 
+        \item Costo total en promedio : O(log U) +O(log U) +O(1) + O(log U)  =  O(log U)
+        \item Costo total en peor : O(log U) +O(U) +O(1) + O(log U)  = O(U)
+    \end{itemize}
+    \item acumularMillas en O(log U  + $|$L$|$  ) caso promedio y O(U + $|$L$|$ ) peor caso
+    \begin{itemize}
+        \item Encontrar la promocion en el Trie: O($|$L$|$ )
+        \item Obtener la informacion de la promocion,  restar del tope si es necesario O(1)
+        \item Eliminar promoción en caso de ser necesario O($|$L$|$ ) [ver eliminarPromocion]
+        \item Encontrar al usuario en el ABB : caso promedio O(log U), peor caso O(U)
+        \item Aumentar los atributos correspondientes al usuario O(1)
+        \item Reajustar la posicion del Usuario en el Heap, de ser requerido, O(log U )
+        \item Costo total en promedio: O($|$L$|$ )+ O(1) +O($|$L$|$ )+ O( U) + O(1) + O(log U) = O( log U + $|$L$|$ )
+        \item Costo total en peor: O($|$L$|$ )+ O(1) +O($|$L$|$ )+ O(log U) + O(1) + O(log U) = O(U + $|$L$|$ )
+    \end{itemize}
+    \item canjearMillas O(log U ) caso promedio y O(U) peor caso
+    \begin{itemize}
+        \item Encontrar al usuario en el ABB : caso promedio O(log U), peor caso O(U)
+        \item Realizar la operacion canjearMillas O(1)
+        \item Caso promedio : O(log U) + O(1) = O(log U),
+        \item Peor caso : O(U) +O(1) = O(U)
+    \end{itemize}
+    \item transferirMillas en O(log U ) caso promedio y O(U) peor caso
+    \begin{itemize}
+        \item Encontrar al usuario transferidor en el ABB : caso promedio O(log U), peor caso O(U)
+        \item Encontrar al usuario receptor en el ABB : caso promedio O(log U), peor caso O(U)
+        \item Realizar el balance correspondiente del saldo de Millas de transferidor O(1)
+        \item Alterar el Heap para reflejar las nuevas millas del transferidor O(log U) en el peor caso
+        \item Actualizar, si fuera necesario, MasCanjeador O(1)
+        \item Realizar el balance correspondiente del saldo de Millas de receptor O(1)
+        \item Alterar el Heap para reflejar las nuevas millas del receptor O(log U) en el peor caso
+        \item Costo Promedio : O(log U) + O(log U) + O(1) + O(log U) + O(1) + O(1) + O(log U) = O(Log U)
+        \item Costo peor : O( U) + O(U) + O(1) + O(log U) + O(1) + O(1) + O(log U) = O(U)
+    \end{itemize}
+    \item consultarSaldo / consultarCategoria en O(log U ) caso promedio y O(U) peor caso
+    \begin{itemize}
+        \item Encontrar al usuario en el ABB : caso promedio O(log U), peor caso O(U)
+        \item Consutlar su saldo/Categoria O(1)
+        \item Caso promedio : O(log U) + O(1) = O(log U),
+        \item Peor caso : O(U) +O(1) = O(U)
+    \end{itemize}
+    \item iniciarPromocion / iniciarPromocionConTope en O($|$L$|$ )
+    \begin{itemize}
+        \item Insertar elemento en Trie O($|$L$|$ )
+        \item En el peor caso por cada letra nueva hay que crear una nueva 'rama' del Trie. Eso tiene consto fijo dado por la longitud del arreglo O(256)
+        \item crear Promocion con o sin tope O(1)
+        \item costo total O($|$L$|$ ) + O(1) = O($|$L$|$ )
+    \end{itemize}
+    \item finalizarPromocion en O($|$L$|$ )
+    \begin{itemize}
+        \item Buscar la promocion en el Trie O($|$L$|$ )
+        \item Eliminar la promocion si solamente se tiene que eliminar la promocion O(1), se se tiene que eliminar ramas O($|$L$|$ )
+        \item costo total pero caso O($|$L$|$ ) + O($|$L$|$ ) = O($|$L$|$ )
+    \end{itemize}
+    \item elMasAcumulador / elMasCanjeador en O(1):
+    \begin{itemize}
+        \item Pedirle informacion a MasAcumulador O(1)
+        \item Pedirle informacion a MasCanjeador O(1)
+    \end{itemize}
+    \item rankingMillas en O(N log U )
+    \begin{itemize}
+        \item Tomar N veces el maximo del Heap N*O(1)
+        \item Copiar los usuarios a un array O(N)
+        \item Volver a ingresar N veces los usuarios al Heap O(N log U)
+        \item Total: N*O(1) + O(N) + O(N log U) = O(N log U)
+    \end{itemize}
+    \item paresTransferidoresExclusivos en O(U)
+    \begin{itemize}
+        \item Recorrer el ABB elemento por elemento O(U)
+        \item Chequear para cada usuario si esta en parTransferidorExclusivo O(1)
+        \item Total : O(U)
+    \end{itemize}
+\end{itemize}
+\end{document}
