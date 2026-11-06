@@ -44,7 +44,7 @@ class Heap<T extends Comparable<T>> {
         _tamaño -= 1;
         T maximo = _data.get(0);
         intercambiar(0, _tamaño);
-        _data.removeLast();
+        _data.remove(_tamaño);
         siftDown(_posicionesDeHeapaOrden.get(0));
         return maximo;
     }
@@ -110,15 +110,7 @@ class Heap<T extends Comparable<T>> {
         }
 
         public void eliminar(){            
-            ABB.this.eliminarNodo(this.usuario);
-        }
-
-        public int compareTo(Handle<T> otroHandle){
-            return this.valor().compareTo(otroHandle.valor());
-        }
-
-        public String toString(){            
-            return ABB.this.toString();
+            throw new UnsupportedOperationException("No se pueden eliminar Usuarios");
         }
 
         public void modificar (T v) {
