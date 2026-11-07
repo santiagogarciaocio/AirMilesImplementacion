@@ -37,15 +37,15 @@ public class AirMiles implements SistemaAirMiles {
         ranking.siftUp(handleReferidor.valor().ID());
 
         masAcumuladorCheck(handleReferidor.valor());        
-        /*No hace falta chequear el UsuarioReferido pues a lo sumo tendran la misma cantidad que el referidor. 
-        EN cuyo caso MasAcumulador, por consigna, es arbitrario cualquiera de los dos */
+        /*No hace falta chequear el UsuarioReferido pues a lo sumo tendrán la misma cantidad que el referidor, 
+        en cuyo caso MasAcumulador, por consigna, es arbitrario cualquiera de los dos */
     }
 
     public void acumularMillas(int id, double distancia, String nombrePromo) {        
         Usuario us = usuarios.buscar(id).valor();
         double factor;
         if (promociones.pertenece(nombrePromo)) {
-        Promocion promocion = promociones.nombreElemento(nombrePromo);
+        Promocion promocion = promociones.buscarElemento(nombrePromo);
             factor = promocion.factor();
         }
         else {
@@ -56,7 +56,7 @@ public class AirMiles implements SistemaAirMiles {
         us.acumularMillas(millas);
         ranking.siftUp(us.ID());        
         if (promociones.pertenece(nombrePromo)) { /*Justificacion en el PDF.*/            
-            Promocion promocion = promociones.nombreElemento(nombrePromo);
+            Promocion promocion = promociones.buscarElemento(nombrePromo);
             if(promocion.tieneTope()){
                 promocion.restarTope(millas);
                 if(promocion.tope() == 0){
@@ -77,11 +77,9 @@ public class AirMiles implements SistemaAirMiles {
         Usuario transferidor = usuarios.buscar(origen).valor();
         Usuario receptor = usuarios.buscar(destino).valor();
         receptor.recibirTransferencia(transferidor, cantidad);
-        if(transferidor.canjeadas() > masCanjeador.canjeadas()){
-            masCanjeador = transferidor;
-        }
         ranking.siftDown(transferidor.ID());
-        ranking.siftUp(receptor.ID());                   
+        ranking.siftUp(receptor.ID());
+        masCanjeadorCheck(transferidor);
     }
     
 
@@ -150,7 +148,6 @@ public class AirMiles implements SistemaAirMiles {
             if(us.esParExclusivo() && us.ultimoTransferidor().ID() > us.ID()){
                 int[] par = {us.ID(), us.ultimoTransferidor().ID()};
                 constructor.add(par);
-                
             }
         }
         int[][] recasteo = new int[constructor.size()][2];
