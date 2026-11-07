@@ -3,94 +3,99 @@ package aed.tp2;
 import java.util.ArrayList;
 
 class Heap<T extends Comparable<T>> {
-    private ArrayList<T> _data;
-    private ArrayList<Integer> _posicionesDeOrdenaHeap; //sus índices son el orden de ingreso al sistema y los valores la pos en el heap
-    private ArrayList<Integer> _posicionesDeHeapaOrden; //sus índices son la pos en el heap y los valores el orden de ingreso al sistema
+    private ArrayList<Nodo> _data;
+    private Vector _posiciones;
     private int _tamaño;
-    private int _orden;
 
     public Heap() {
-        _data = new ArrayList<T>();
-        _posicionesDeOrdenaHeap = new ArrayList<Integer>();
-        _posicionesDeHeapaOrden = new ArrayList<Integer>();
+        _data = new ArrayList<Nodo>();
+        _posiciones = new Vector();
         _tamaño = 0;
-        _orden = 0;
+    }
+
+    private class Nodo {
+        int ID;
+        T elem;
+
+        Nodo (int id, T elem) {
+            this.ID = id;
+            this.elem = elem;
+        }
     }
 
     public int tamaño() {
         return _tamaño;
     }
 
-    public int orden() {
-        return _orden;
-    }
-
     public T máximo () {
         if(_tamaño == 0) {throw new UnsupportedOperationException("Vacío");}
-        return _data.get(0);
+        return _data.get(0).elem;
     }
 
-    public Handle<T> agregar(T u) {
+    public Handle<T> agregar(int clave, T u) {
+        Nodo nuevoNodo = new Nodo(clave, u);
+        _data.add(nuevoNodo);
+        _posiciones.agregar(clave, _tamaño);
+        siftUp(nuevoNodo.ID);
         _tamaño += 1;
-        _data.add(u);
-        _posicionesDeOrdenaHeap.add(_tamaño - 1);
-        _posicionesDeHeapaOrden.add(_tamaño - 1, _orden);
-        siftUp(_orden);
-        _orden ++;
         return new HandleHeap(u);
     }
 
     public T desencolar(){
-        _tamaño -= 1;
-        T maximo = _data.get(0);
-        intercambiar(0, _tamaño);
-        _data.remove(_tamaño);
-        siftDown(_posicionesDeHeapaOrden.get(0));
+        T maximo = _data.get(0).elem;
+        if (_tamaño > 1) {
+            intercambiar(_data.get(0).ID, _data.get(_tamaño - 1).ID);
+            _data.removeLast();
+            _tamaño -= 1;
+            siftDown(_data.get(0).ID);
+        }
+        else {
+            _data.removeLast();
+            _tamaño -= 1;
+        }
         return maximo;
     }
 
-    private void intercambiar(int i, int j) {
-        T elem_1 = _data.get(i);
-        T elem_2 = _data.get(j);
-        _data.set(i, elem_2);
-        _data.set(j, elem_1);
+    private void intercambiar(int id_1, int id_2) {
+        int posicionEnHeap_id_1 = _posiciones.obtener(id_1);
+        int posicionEnHeap_id_2 = _posiciones.obtener(id_2);
 
-        int id_i = _posicionesDeHeapaOrden.get(i);
-        int id_j = _posicionesDeHeapaOrden.get(j);
+        Nodo nodo_1 = _data.get(posicionEnHeap_id_1);
+        Nodo nodo_2 = _data.get(posicionEnHeap_id_2);
 
-        _posicionesDeHeapaOrden.set(i, id_j);
-        _posicionesDeHeapaOrden.set(j, id_i);
+        _data.set(posicionEnHeap_id_1, nodo_2);
+        _data.set(posicionEnHeap_id_2, nodo_1);
 
-        _posicionesDeOrdenaHeap.set(id_i, j);
-        _posicionesDeOrdenaHeap.set(id_j, i);
+        _posiciones.modificarPosicion(id_1, posicionEnHeap_id_2);
+        _posiciones.modificarPosicion(id_2, posicionEnHeap_id_1);
     }
 
-    public void siftUp(int j) {
-        int i = _posicionesDeOrdenaHeap.get(j);
+    public void siftUp(int id) {
+        int i = _posiciones.obtener(id);
         while (i > 0) {
             int padre = (i - 1)/ 2;
-            if (_data.get(i).compareTo(_data.get(padre)) > 0) {
-                intercambiar(i, padre);
+            if (_data.get(i).elem.compareTo(_data.get(padre).elem) > 0) {
+                intercambiar(_data.get(i).ID, _data.get(padre).ID);
                 i = padre;
             }
             else return; 
         }
     }
 
-    public void siftDown(int j) {
-        int i = _posicionesDeOrdenaHeap.get(j);
+    public void siftDown(int id) {
+        int i = _posiciones.obtener(id);
         while ((i * 2) + 1 < tamaño()) {
             int izq = (i * 2) + 1;
             int der = (i * 2) + 2;
             int hijoMayor;
-            if (der < tamaño() && _data.get(der).compareTo(_data.get(izq)) > 0) {
+            if (der < tamaño() && _data.get(der).elem.compareTo(_data.get(izq).elem) > 0) {
                 hijoMayor = der;
             }
             else {
                 hijoMayor = izq;
             }
-            if (_data.get(i).compareTo(_data.get(hijoMayor)) < 0) {
-                intercambiar(i, hijoMayor);
+            if (_data.get(i).elem.compareTo(_data.get(hijoMayor).elem) < 0) {
+                intercambiar(_data.get(i).ID, _data.get(hijoMayor).ID);
                 i = hijoMayor;
             }
             else {
@@ -110,7 +115,15 @@ class Heap<T extends Comparable<T>> {
         }
 
         public void eliminar(){            
-            throw new UnsupportedOperationException("No se pueden eliminar Usuarios");
+            ABB.this.eliminarNodo(this.usuario);
+        }
+
+        public int compareTo(Handle<T> otroHandle){
+            return this.valor().compareTo(otroHandle.valor());
+        }
+
+        public String toString(){            
+            return ABB.this.toString();
         }
 
         public void modificar (T v) {
