@@ -45,12 +45,12 @@ class Heap<T extends Comparable<T>> {
         T maximo = _data.get(0).elem;
         if (_tamaño > 1) {
             intercambiar(_data.get(0).ID, _data.get(_tamaño - 1).ID);
-            _data.removeLast();
+            _data.remove(_tamaño - 1);
             _tamaño -= 1;
             siftDown(_data.get(0).ID);
         }
         else {
-            _data.removeLast();
+            _data.remove(_tamaño - 1);
             _tamaño -= 1;
         }
         return maximo;
@@ -104,30 +104,22 @@ class Heap<T extends Comparable<T>> {
         }}
 
     public class HandleHeap implements Handle<T>{
-        private T usuario;
+        private T elem;
 
         private HandleHeap(T elem){
-            this.usuario = elem;
+            this.elem = elem;
         }
 
         public T valor(){
-            return this.usuario;
+            return this.elem;
         }
 
         public void eliminar(){            
-            ABB.this.eliminarNodo(this.usuario);
-        }
-
-        public int compareTo(Handle<T> otroHandle){
-            return this.valor().compareTo(otroHandle.valor());
-        }
-
-        public String toString(){            
-            return ABB.this.toString();
+            this.elem = null;
         }
 
         public void modificar (T v) {
-            this.usuario = v;
+            this.elem = v;
         }
 
         public boolean equals (Handle<T> otroHandle) {
