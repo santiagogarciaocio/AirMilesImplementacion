@@ -45,7 +45,7 @@ public class AirMiles implements SistemaAirMiles {
         Usuario us = usuarios.buscar(id).valor();
         double factor;
         if (promociones.pertenece(nombrePromo)) {
-        Promocion promocion = promociones.promocion(nombrePromo);
+        Promocion promocion = promociones.nombreElemento(nombrePromo);
             factor = promocion.factor();
         }
         else {
@@ -56,7 +56,7 @@ public class AirMiles implements SistemaAirMiles {
         us.acumularMillas(millas);
         ranking.siftUp(us.ID());        
         if (promociones.pertenece(nombrePromo)) { /*Justificacion en el PDF.*/            
-            Promocion promocion = promociones.promocion(nombrePromo);
+            Promocion promocion = promociones.nombreElemento(nombrePromo);
             if(promocion.tieneTope()){
                 promocion.restarTope(millas);
                 if(promocion.tope() == 0){
