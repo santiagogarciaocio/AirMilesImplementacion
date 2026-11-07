@@ -46,17 +46,6 @@ class ABB<T> {
         return actual.ID;        
     }
 
-    public boolean pertenece(T elem){ // esta creo que no se puede hacer en O(log n) ya que hay que recorrer todos los nodos
-        return perteneceAux(_raíz, elem);
-    }
-
-    private boolean perteneceAux (Nodo nodo, T elem) {
-        if (nodo == null) {return false;}
-        if (elem.compareTo(nodo.valor) == 0) {return true;}
-        if (elem.compareTo(nodo.valor) > 0) {return perteneceAux (nodo.der, elem);}
-        else {return perteneceAux (nodo.izq, elem);}
-    }
-
     public boolean pertenece(int id){
         if (_cardinal == 0) {
             return false;
@@ -121,90 +110,6 @@ class ABB<T> {
                         return;
                     }
                 }}}
-    }
-/* En ningun momento usamos eliminar. No parece ser una opcion de AirMilles eliminar un usuario */
-    public void eliminarNodo (T elem) {
-        if(!pertenece(elem)){ //si no pertenece no hago nada
-            return;
-        }
-        Nodo actual = _raíz;
-        while(actual.valor.compareTo(elem) != 0){ //Busco elemento a eliminar
-            if(elem.compareTo(actual.valor) < 0){
-                actual = actual.izq;            
-            }else if(elem.compareTo(actual.valor) > 0){
-                actual = actual.der;
-            }
-        }
-        if((actual.der != null) && (actual.izq !=null)){ //caso dos arboles hijos
-            Nodo sucesorInmediato = actual.der; // encuentro el sucesor inmediato            
-            while (sucesorInmediato.izq != null){
-                sucesorInmediato = sucesorInmediato.izq;
-            }
-            actual.valor = sucesorInmediato.valor;
-
-            if(sucesorInmediato == actual.der){
-                actual.der = sucesorInmediato.der;
-                if(sucesorInmediato.der != null){
-                    sucesorInmediato.der.padre = actual;
-                }
-            }else{                
-                sucesorInmediato.padre.izq = sucesorInmediato.der;
-                if(sucesorInmediato.der != null){
-                    sucesorInmediato.der.padre = sucesorInmediato.padre;
-                }
-            }}
-        else if((actual.der != null) || (actual.izq !=null)){ //caso un arbol
-            if(actual == _raíz){
-                if(actual.der != null){
-                    _raíz = actual.der;
-                    actual.der.padre = null;
-                }else{
-                    _raíz = actual.izq;
-                    actual.izq.padre = null;
-                }
-            }
-            else if(actual ==actual.padre.izq){
-                if(actual.der != null){
-                    actual.der.padre = actual.padre;
-                    actual.padre.izq = actual.der;
-                }else{
-                    actual.izq.padre = actual.padre;
-                    actual.padre.izq = actual.izq;
-                }
-            }else{
-                if(actual.der != null){
-                    actual.der.padre = actual.padre;
-                    actual.padre.der = actual.der;
-                }else{
-                    actual.izq.padre = actual.padre;
-                    actual.padre.der = actual.izq;
-                }}}
-        else{ //caso eliminar hoja
-            if(actual == _raíz){
-                _raíz = null;
-            }else{
-                if(actual == actual.padre.izq){
-                    actual.padre.izq = null;
-                }else{actual.padre.der = null;}
-
-            }}
-        _cardinal --;
-    }
-
-    public String toString(){
-        if(_cardinal == 0){return "{}";}
-        else{
-            String res = "{";
-            ABB<T>.ABB_Iterador iterador = new ABB_Iterador();
-            while(iterador.haySiguiente()){
-                res = res+iterador.siguiente().toString();
-                if(iterador.haySiguiente()){res = res+",";}
-            }
-            if(_cardinal == 1) {
-                res = res+maximo();
-            }else{res = res+","+maximo();}
-            return res+"}";
-        }
     }
 
     public class ABB_Iterador {
