@@ -8,11 +8,11 @@ public class Trie<T> {
     private class Nodo<T> {
         private Nodo<T>[] letras;
         private T elem;
-        private int cantHijos;
+        private int palabrasEnRama;
 
         public Nodo() {
             letras = (Nodo<T>[]) new Nodo[256];
-            cantHijos = 0;
+            palabrasEnRama = 0;
         }
 
         public int indice(char c) {
@@ -61,17 +61,17 @@ public class Trie<T> {
         Nodo<T> nodo_actual = raiz;
         while (i < nombreElemento.length()) {
             if (nodo_actual.haySiguiente(nombreElemento.charAt(i))) {
-                nodo_actual.cantHijos ++;
+                nodo_actual.palabrasEnRama ++;
                 nodo_actual = nodo_actual.Siguiente(nombreElemento.charAt(i));
                 i++;
             }
             else {
-                nodo_actual.cantHijos ++;
+                nodo_actual.palabrasEnRama ++;
                 nodo_actual = nodo_actual.agregarNodo(nombreElemento.charAt(i));
                 i++;
             }
         }
-        nodo_actual.cantHijos ++;
+        nodo_actual.palabrasEnRama ++;
         nodo_actual.elem = elemento;
         return;
     }
@@ -81,9 +81,9 @@ public class Trie<T> {
         int i = 0;
         Nodo<T> nodo_actual = raiz;
         while (i < nombreElemento.length()) {
-            nodo_actual.cantHijos --;            
+            nodo_actual.palabrasEnRama --;            
             nodo_actual = nodo_actual.Siguiente(nombreElemento.charAt(i));
-            if(nodo_actual.cantHijos == 1){
+            if(nodo_actual.palabrasEnRama == 1){
                 break;}
             i++;            
             }
@@ -104,7 +104,7 @@ public class Trie<T> {
         nodo_actual.letras[nombreElemento.charAt(i)] = null;
     }
 
-    public T nombreElemento(String nombreElemento) {
+    public T buscarElemento(String nombreElemento) {
         int i = 0;
         Nodo<T> nodo_actual = raiz;
         while (i < nombreElemento.length()) {
