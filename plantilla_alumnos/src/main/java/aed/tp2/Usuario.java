@@ -7,7 +7,6 @@ class Usuario implements Comparable<Usuario> {
     private double Canjeadas;
     private boolean esParExclusivo;
     private Usuario ultimoTransferidor;
-    private int ordenDeLlegada;
     /* guardar la informacion completa de enviadas y recibidas/ de si es trasnferidos y receptor exlusivao
     Entonces cuando estamos recorriendo el ABB para 'paresTransferidoresExlusivos' y vemos que efectivamente es trasnfereridor exclusivo. 
     si es menor a su pareja lo ponemos en la lista
@@ -40,14 +39,6 @@ class Usuario implements Comparable<Usuario> {
 
     public int ID(){
         return this.ID;
-    }
-
-    public int ordenDeLlegada(){
-        return ordenDeLlegada;
-    }
-
-    public void setOrdenDeLlegada(int i){
-        ordenDeLlegada = i;
     }
     
     public double totales(){
