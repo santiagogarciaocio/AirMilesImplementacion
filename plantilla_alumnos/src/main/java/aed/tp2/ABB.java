@@ -211,13 +211,19 @@ class ABB<T> {
         private Nodo _actual;
 
         public ABB_Iterador(){
+            if (_raíz == null){
+                return; 
+            }
             _actual = _raíz;
             while(_actual.izq != null){
                 _actual = _actual.izq; 
             }
         }
 
-        public boolean haySiguiente() {            
+        public boolean haySiguiente() {
+            if (_raíz == null){
+                return false;
+            }   
             return _actual.ID != maximo();
         }
     
