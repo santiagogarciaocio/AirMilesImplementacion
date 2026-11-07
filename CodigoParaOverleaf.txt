@@ -43,55 +43,53 @@ El TAD AirMilles fue implementado con el siguiente diseño:
 \begin{itemize}
     \item MaxHeap de Usuarios.
 \end{itemize}
-Esta estructura es vital para cumplir las complejidades requeridas para la operacion RankingMillas.
-Como trade-off de agregar el Heap surgio el problema: Vincular a los Usuarios con la posicion en el Heap.
-Recordemos que el Heap es O(1) para obtener el maximo, pero para cualquier otro elemento es O(N). \\
-Un primer intento de solucionar este problema consistió en agregar a cada Usuario un atributo con su posicion en el Heap, logrando asi ir a su posicion en O(1).\\
-Sin emargo al momento de hacer shiftUp o shiftDown, operaciones necesarias para manter el invariante de la estructura cada vez que un usuario acunmula o canjea Millas, habria que modificar el indice de todos los usuarios afectados por el shift.\\
-Por lo tanto necesitabamos poder acceder y modificar el indice de los Usuarios en O(1) para cualquier usuario.
-Esto nos llevo a la solucion adoptada finalmente.
-Guardar como atributo del heap dos arrays.\\
-Uno de ellos, posicionesDeOrdenaHeap indica, dado un usuario (reconocido por su orden de ingreso al sistema) devuelve su indice actual en el Heap. Para obtener el orden de los Usuarios, el Heap tiene tambien un atributo orden. Un contador que va creciendo cuando ingresan nuevos usuarios. No podemos usar el atributo tamaño porque cuando realizamos la operacion de desencolar y encolar (para el metodo rankingMillas) los reingresos tendrían todos el mismo indice.\\ 
-El otro posicionesDeHeapaOrden indica, dada una posicion del Heap el usuario que ubica esa posicion.
+Esta estructura es vital para cumplir las complejidades requeridas para la operación rankingMillas.
+Como trade-off de agregar el Heap surgió un problema: Vincular a los usuarios con sus posiciones en el Heap.
+Recordemos que el Heap es O(1) para obtener el máximo, pero para cualquier otro elemento es O(U).
 
-Esto nos permite dado un usuario, realizar las operaciones de shiftDown/shiftDown en, el peor caso en O(log N)  si el usuario pasa del fin del Heap al Inicio. Y en  cada intercambio de posiciones entre usuario y sus 'padres' las actualizaciones de sus indices se realizan en O(1).
+Un primer intento para solucionar este problema consistió en agregar a cada usuario un atributo con su posicion en el Heap, logrando así ir a su posicion en O(1).
 
-Si no tuviesemos los indices los tendriamos que buscar en el ABB en tiempo O(Log N) para encontrarlo y O(log N) cantidad de busquedas por posibles padres. Finalmente con O(log(N)²) excediendonos de complejidad O(log N) requerida en las operaciones.
+Sin embargo al momento de hacer siftUp o siftDown, operaciones necesarias para mantener el invariante de la estructura, cada vez que un usuario acumula o canjea millas, habría que modificar el índice de todos los usuarios afectados por el shift.
+
+Por lo tanto necesitábamos poder acceder y modificar, desde la clase heap, el índice de los usuarios en O(1) para cualquier usuario. Para lograr esto, decidimos que el heap no contenga simplemente a los usuarios, sino a nodos cuyas componentes son un elemento, que en nuestro caso son los usuarios, y un ID para identificarlos.
+
+Además, tenemos un array de posiciones, cuyos índices representan el ID del usuario, por ejemplo, posiciones[1] nos dice en qué posición del heap está el usuario con ID 1 (para esto definimos una clase Vector ya que ArrayList no te deja agregar en la posición 10 si no tenés nada en la 0 a la 9, y queremos que los IDs puedan ingresar en cualquier orden). De esta manera podemos intercambiar las posiciones en el heap de 2 usuarios en tiempo constante, así que una vez que tenemos el ID del usuario al que queremos aumentar o decrecer sus millas, acomodarlo en el heap será O(log U) en el peor caso.
+
 
 \begin{itemize}
-    \item ABB que guarda la informacion de los Usuarios.  
-    \begin{itemize}
-        \item El ABB esta conectado con el Heap via Handle; y ordenado via el ID del Usuario.
-    \end{itemize}
+    \item ABB que guarda los handles de los Usuarios.  
+\end{itemize}
+El ABB está conectado con el heap via handle, y ordenado via el ID del usuario. Como tenemos un ABB y no un AVL encontrar a un usuario por ID va a ser O(U) en el peor caso, pero O(log U) en el caso promedio.
+\begin{itemize}
     \item Trie de Promociones.
 \end{itemize}    
-Implementado en forma de arreglo. En particular tenemos nodos de longitud 256. Cada posicion del nodo representa un caracter. Cuando se ingresa una neuva promocion cada caracter crea nuevos nodos iterativamente Al finalizar el nombre de la promocion el atributo 'Elem' pasa a contener dicha Promocion, que es una clase.  
+Implementado en forma de arreglo. En particular tenemos nodos de longitud 256. Cada posición del nodo representa un caracter. Cuando se ingresa una nueva promoción cada caracter crea nuevos nodos iterativamente. Al finalizar el nombre de la promoción, el atributo 'Elem' pasa a contener un elemento de la clase promoción.  
 
-Para poder eliminar promociones, de forma tal que se eliminan todos los nodos que no llevan a ninguna promocion, utilizamos el atributo cantHijos. Este cuenta la cantidad de palabras que pasan por él. Una vez que dicho atributo nos marca 1, nos esta indicando que a partir de ese momento la unica promocion en ese camino del Trie es la que queremos borrar.
+Para poder eliminar promociones, de forma tal que se eliminan todos los nodos que no llevan a ninguna promoción, utilizamos el atributo cantHijos. Éste cuenta la cantidad de palabras que pasan por él. Una vez que dicho atributo nos marca 1, nos está indicando que a partir de ese momento la única promoción en ese camino del Trie es la que queremos borrar.
 
 \begin{itemize}
     \item MasAcumulador.
     \begin{itemize}
-        \item El usuario que al momento es el que tiene mas millas totales.
+        \item El usuario que al momento tiene más millas totales.
     \end{itemize}
     \item MasCanjeador.
     \begin{itemize}
-        \item El usuario que al momento gasto mas millas.
+        \item El usuario que al momento gastó más millas.
     \end{itemize}
 \end{itemize}
 
-Promocion y Usuarios son Clases con sus correspondientes atributos y métodos.
+Promocion y Usuario son clases con sus correspondientes atributos y métodos.
 
 \section{Complejidades}
 
-Veamos  que ese diseño nos permite cumplir con todas las complejidades requeridas para cada operacion.
+Veamos  que ese diseño nos permita cumplir con todas las complejidades requeridas para cada operación.
 \begin{itemize}
     \item crearSistema en O(1) 
     \begin{itemize}
         \item Inicializar ABB O(1) 
         \item Inicializar Heap O(1) 
         \item Inicializar Trie O(1) 
-        \item         agregarPromocion('NoPromo') O(|"NoPromo"|),  [Ver iniciarPromo]
+        \item         agregarPromocion('NoPromo') O(7) = O(1)
         \item Total = O(1)
     \end{itemize}
     \item registrarUsuario / registrarUsuarioConReferidor en O(log U) caso promedio y O(U) peor caso
