@@ -1,7 +1,6 @@
 package aed.tp2;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TrieTests {
@@ -9,19 +8,20 @@ public class TrieTests {
 
     @Test
     void crearTrie() {
-        Trie<Promocion> tr = new Trie<>();
+        Trie<Promocion> tr = new Trie<Promocion>();
 
         
-        tr.agregar("nopromo",1);
+        tr.agregar("nopromo",new Promocion("nopromo",1));
 
         assertTrue(tr.pertenece("nopromo"));
     }
 
     @Test
     void crearPromoConTope() {
-        Trie<Promocion> tr = new Trie();
+        Trie<Promocion> tr = new Trie<Promocion>();
+        tr.agregar("nopromo",new Promocion("nopromo",1));
 
-        tr.agregar("nolimits", 3.15, 100000);
+        tr.agregar("nolimits", new Promocion("nolimits",3.15, 100000));
 
         assertTrue(tr.pertenece("nolimits"));
         assertFalse(tr.pertenece("No limitss"));
@@ -29,9 +29,10 @@ public class TrieTests {
 
     @Test
     void pertenece() {
-        Trie<Promocion> tr = new Trie();
+        Trie<Promocion> tr = new Trie<Promocion>();
+        tr.agregar("nopromo",new Promocion("nopromo",1));
 
-        tr.agregar("nolimits", 3.15, 100000);
+        tr.agregar("nolimits",new Promocion("nolimits", 3.15, 100000));
 
         assertTrue(tr.pertenece("nolimits"));
         assertFalse(tr.pertenece("nolimit"));
@@ -39,9 +40,24 @@ public class TrieTests {
 
     @Test
     void eliminarPromo() {
-        Trie<Promocion> tr = new Trie();
-        tr.agregar("nopromo",1);
-        tr.agregar("nolimits", 3.15, 100000);
+        Trie<Promocion> tr = new Trie<Promocion>();
+        tr.agregar("nopromo",new Promocion("nopromo",1));
+        
+        tr.agregar("nolimits",new Promocion("nolimits", 3.15, 100000));
+
+        assertTrue(tr.pertenece("nolimits"));
+
+        tr.eliminar("nolimits");
+
+        assertFalse(tr.pertenece("nolimits"));
+    }
+
+    @Test
+    void poda() {
+        Trie<Promocion> tr = new Trie<Promocion>();
+        tr.agregar("nopromo",new Promocion("nopromo",1));
+        
+        tr.agregar("nolimits",new Promocion("nolimits", 3.15, 100000));
 
         assertTrue(tr.pertenece("nolimits"));
 
@@ -52,9 +68,9 @@ public class TrieTests {
 
     @Test
     void eliminarSinCompartidas() {
-        Trie<Promocion> tr = new Trie();
-        tr.agregar("nopromo",1);
-        tr.agregar("sipromo", 3.15, 100000);
+        Trie<Promocion> tr = new Trie<Promocion>();
+        tr.agregar("nopromo",new Promocion("nopromo",1));
+        tr.agregar("sipromo",new Promocion("sipromo", 3.15, 100000));
 
         assertTrue(tr.pertenece("nopromo"));
         assertTrue(tr.pertenece("sipromo"));        
@@ -67,10 +83,10 @@ public class TrieTests {
 
     @Test
     void eliminarPrefijo() {
-        Trie<Promocion> tr = new Trie();
-        
-        tr.agregar("nopromo",1);
-        tr.agregar("nopromociones",2);
+        Trie<Promocion> tr = new Trie<Promocion>();
+
+        tr.agregar("nopromo",new Promocion("nopromo",1));
+        tr.agregar("nopromociones",new Promocion("nopromociones",2));
 
         tr.eliminar("nopromo");
 
@@ -80,10 +96,10 @@ public class TrieTests {
 
     @Test
     void eliminarSufijo() {
-        Trie<Promocion> tr = new Trie();
+        Trie<Promocion> tr = new Trie<Promocion>();
         
-        tr.agregar("nopromo",1);
-        tr.agregar("nopromociones",2);
+        tr.agregar("nopromo",new Promocion("nopromo",1));
+        tr.agregar("nopromociones",new Promocion("nopromociones",2));
 
         tr.eliminar("nopromociones");
 
@@ -93,13 +109,14 @@ public class TrieTests {
 
     @Test
     void modificarPromo() {
-        Trie<Promocion> tr = new Trie();
+        Trie<Promocion> tr = new Trie<Promocion>();
+        tr.agregar("nopromo",new Promocion("nopromo",1));
 
-        tr.agregar("nolimits", 3.15, 100000);
+        tr.agregar("nolimits",new Promocion("nolimits", 3.15, 100000));
         
-        Promocion prm = tr.promocion("nolimits");
+        Promocion prm = tr.buscarElemento("nolimits");
         prm.restarTope(50000);
-        assertEquals(50000,tr.promocion("nolimits").tope());
+        assertEquals(50000,tr.buscarElemento("nolimits").tope());
 
     }
 }

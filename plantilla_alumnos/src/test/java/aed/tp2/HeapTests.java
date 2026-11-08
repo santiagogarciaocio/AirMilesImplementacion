@@ -2,7 +2,6 @@ package aed.tp2;
 
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HeapTests {
@@ -18,7 +17,7 @@ public class HeapTests {
         Heap<Usuario> hp = new Heap<Usuario>();
         Usuario u1 = new Usuario(1);
 
-        hp.agregar(1, u1);
+        hp.agregar(1,u1);
         assertEquals(1, hp.tamaño());
 
         hp.desencolar();
@@ -50,13 +49,13 @@ public class HeapTests {
         u7.acumularMillas(1000);
 
  
-        hp.agregar(1, u1);
-        hp.agregar(2, u2);
-        hp.agregar(3, u3);
-        hp.agregar(4, u4);
-        hp.agregar(5, u5);
-        hp.agregar(6, u6);
-        hp.agregar(7, u7);
+        hp.agregar(1,u1);
+        hp.agregar(2,u2);
+        hp.agregar(3,u3);
+        hp.agregar(4,u4);
+        hp.agregar(5,u5);
+        hp.agregar(6,u6);
+        hp.agregar(7,u7);
 
         assertEquals(7, hp.tamaño());
 
@@ -80,7 +79,51 @@ public class HeapTests {
         
         assertEquals(u2, hp.desencolar());
         assertEquals(0, hp.tamaño());
+    }
 
+     @Test
+    void shiftUpyDown() {
+        Heap<Usuario> hp = new Heap<Usuario>();
+        Usuario u1 = new Usuario(1);
+        Usuario u2 = new Usuario(2);
+        Usuario u3 = new Usuario(3);
+
+        u1.acumularMillas(500);
+        u2.acumularMillas(10);
+        u3.acumularMillas(100);
+
+        hp.agregar(1,u1);
+        hp.agregar(2,u2);
+        hp.agregar(3,u3);
+
+        assertEquals(u1, hp.desencolar());
+        assertEquals(u3, hp.desencolar());
+        assertEquals(u2, hp.desencolar());
+
+        hp.agregar(1,u1);
+        hp.agregar(2,u2);
+        hp.agregar(3,u3);
+
+        u3.acumularMillas(401);
+        hp.siftUp(3);
+        assertEquals(u3, hp.desencolar());
+        hp.agregar(3,u3);
+
+        u1.canjearMillas(498);
+        hp.siftDown(1);
+        assertEquals(u3, hp.desencolar());
+        assertEquals(u2, hp.desencolar());
+        assertEquals(u1, hp.desencolar());
+
+
+        hp.agregar(1,u1);
+        hp.agregar(2,u2);
+        hp.agregar(3,u3);
+
+        u3.canjearMillas(200);
+        hp.siftDown(3);
+        u2.acumularMillas(50);
+        hp.siftUp(2);
     }
 
 

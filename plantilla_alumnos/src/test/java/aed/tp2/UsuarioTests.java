@@ -1,7 +1,6 @@
 package aed.tp2;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UsuarioTests {
@@ -39,17 +38,15 @@ public class UsuarioTests {
         assertEquals(50, us.disponibles());
     }
 
-    /*testeo transferencias */
+    /*testeo varias transferencias */
     @Test
     void transferenciasVarias() {
         Usuario us1 = new Usuario(1328);
         Usuario us2 = new Usuario(1234);
         assertEquals(1328, us1.ID());
         /*chequero que los atributos esten bien */
-        assertFalse(us1.esTransferidorExlusivo());        
-        assertFalse(us1.esReceptorExlusivo()); 
-        assertEquals(us1.ID(), us1.ultimoUsuarioTransferido());
-        assertEquals(us1.ID(), us1.ultimoUsuarioRecibido());
+        assertFalse(us1.esParExclusivo());        
+        assertEquals(null, us1.ultimoTransferidor());
 
         us1.acumularMillas(1000);
         us2.acumularMillas(1000);
@@ -57,23 +54,19 @@ public class UsuarioTests {
         assertEquals(1000, us1.totales());
         assertEquals(1000, us2.totales());
 
-        us1.transferencia(us2,150);
-
-        assertEquals(850, us1.totales());
+        us2.recibirTransferencia(us1,150);
+        /*Transferencia solo de un lado deberia generar PartransferidorExclusivo para ambos usuarios*/
+        assertEquals(1000, us1.totales());
         assertEquals(850, us1.disponibles());
         assertEquals(150, us1.canjeadas());
-        assertEquals(true, us1.esTransferidorExlusivo());
-        assertEquals(us2.ID(), us1.ultimoUsuarioTransferido());
-        assertEquals(false, us1.esReceptorExlusivo());
-        assertEquals(us1.ID(), us1.ultimoUsuarioRecibido());
+        assertEquals(true, us1.esParExclusivo());
+        assertEquals(us2, us1.ultimoTransferidor());
 
-        assertEquals(1150, us2.totales());
+        assertEquals(1000, us2.totales());
         assertEquals(1150, us2.disponibles());
         assertEquals(0, us2.canjeadas());
-        assertEquals(false, us2.esTransferidorExlusivo());
-        assertEquals(us2.ID(), us2.ultimoUsuarioTransferido());
-        assertEquals(true, us2.esReceptorExlusivo());
-        assertEquals(us1.ID(), us2.ultimoUsuarioRecibido());        
+        assertEquals(true, us2.esParExclusivo());
+        assertEquals(us1, us2.ultimoTransferidor());
     }
 
     /*testeo pares trasnferidores exlusivos */
@@ -85,30 +78,30 @@ public class UsuarioTests {
         us1.acumularMillas(1000);
         us2.acumularMillas(1000);
 
-        us1.transferencia(us2,150);
+        us2.recibirTransferencia(us1,150);
 
-        assertFalse(us1.estaEnParejaTransferidoresExclusivos());
-        assertFalse(us2.estaEnParejaTransferidoresExclusivos());
+        assertTrue(us1.esParExclusivo());
+        assertTrue(us2.esParExclusivo());
         
-        us2.transferencia(us1,500);
+        us1.recibirTransferencia(us2,500);
 
         /*interaccion basica dos a dos */
 
-        assertTrue(us1.estaEnParejaTransferidoresExclusivos());
-        assertTrue(us2.estaEnParejaTransferidoresExclusivos());
+        assertTrue(us1.esParExclusivo());
+        assertTrue(us2.esParExclusivo());
 
-        assertEquals(us2.ID(), us1.parejaTransferidoraExclusiva());
-        assertEquals(us1.ID(), us2.parejaTransferidoraExclusiva());
+        assertEquals(us2, us1.ultimoTransferidor());
+        assertEquals(us1, us2.ultimoTransferidor());
 
-        /*hay mas transferencias con terceros */
+        /*Trasnferencia de terceros deberia romper ParExclusivo para todos los usuarios involucrados*/
 
         Usuario us3 = new Usuario(4567,true);
 
-        us3.transferencia(us1, 250);        
+        us1.recibirTransferencia(us3, 250);        
 
-        assertFalse(us1.estaEnParejaTransferidoresExclusivos());
-        assertFalse(us2.estaEnParejaTransferidoresExclusivos());
-        assertFalse(us3.estaEnParejaTransferidoresExclusivos());        
+        assertFalse(us1.esParExclusivo());
+        assertFalse(us2.esParExclusivo());
+        assertFalse(us3.esParExclusivo());        
     }
 
 }
