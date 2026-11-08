@@ -18,8 +18,7 @@ public class HeapTests {
         Heap<Usuario> hp = new Heap<Usuario>();
         Usuario u1 = new Usuario(1);
 
-        hp.agregar(u1);
-        assertEquals(u1, hp.máximo());
+        hp.agregar(1, u1);
         assertEquals(1, hp.tamaño());
 
         hp.desencolar();
@@ -51,13 +50,13 @@ public class HeapTests {
         u7.acumularMillas(1000);
 
  
-        hp.agregar(u1);
-        hp.agregar(u2);
-        hp.agregar(u3);
-        hp.agregar(u4);
-        hp.agregar(u5);
-        hp.agregar(u6);
-        hp.agregar(u7);
+        hp.agregar(1, u1);
+        hp.agregar(2, u2);
+        hp.agregar(3, u3);
+        hp.agregar(4, u4);
+        hp.agregar(5, u5);
+        hp.agregar(6, u6);
+        hp.agregar(7, u7);
 
         assertEquals(7, hp.tamaño());
 
