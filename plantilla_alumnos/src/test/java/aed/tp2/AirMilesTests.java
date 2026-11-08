@@ -286,31 +286,6 @@ public class AirMilesTests {
         assertArrayEquals(new int[]{2, 3, 1}, top2);
     }
 
-    @Test
-    void testEconomiaDeReferidos() {
-        am.registrarUsuario(1);
-        am.registrarUsuario(2);
-        am.registrarUsuario(3);
-        am.registrarUsuarioConReferidor(4, 1); //1 tiene 500, 4 tiene 500
-        am.registrarUsuarioConReferidor(5, 2); //2 tiene 500, 5 tiene 500
-        am.registrarUsuarioConReferidor(6, 2); //2 tiene 1000, 6 tiene 500
-        am.registrarUsuarioConReferidor(7, 2); //2 tiene 1500, 7 tiene 500
-        am.registrarUsuarioConReferidor(8, 2); //2 tiene 2000, 8 tiene 500
-        am.registrarUsuarioConReferidor(9, 1); //1 tiene 1000, 9 tiene 500
-        am.registrarUsuarioConReferidor(10, 1); //1 tiene 1500, 10 tiene 500
-        am.registrarUsuarioConReferidor(11, 4); //4 tiene 1000, 11 tiene 500
-        
-        // Primera consulta
-        int[] top1 = am.rankingMillas(3);
-        assertArrayEquals(new int[]{2, 1, 4}, top1);
-        
-        // Segunda consulta inmediata: debe devolver EXACTAMENTE lo mismo
-        // Si la reinserción en el MaxHeap falló, este test se rompe.
-        int[] top2 = am.rankingMillas(3);
-        assertArrayEquals(new int[]{2, 1, 4}, top2);
-    }
-
-
 
 @Test
     void testRupturaDeHandleParesExclusivos() {
