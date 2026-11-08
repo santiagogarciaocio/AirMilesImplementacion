@@ -11,6 +11,8 @@ public class PromocionesTests {
         assertEquals("No promo", prm.nombre());
         assertEquals(1, prm.factor());
         assertFalse(prm.tieneTope());
+        assertEquals(Double.POSITIVE_INFINITY, prm.tope());        
+        prm.restarTope(10000000);
         assertEquals(Double.POSITIVE_INFINITY, prm.tope());
 
         Promocion prm2 = new Promocion("Test",2.5, 20000);
